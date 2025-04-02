@@ -154,44 +154,27 @@
             flex-direction: column;
             height: 100vh;
             overflow: hidden;
-        }
-
-        .container {
-            flex: 1;
             background-color: white;
-            height: calc(100vh - 40px);
-            display: flex;
-            flex-direction: column;
-            overflow: hidden;
         }
 
-        .tabs {
-            display: flex;
-            background-color: #1a73e8;
-            flex-wrap: wrap;
-            position: relative;
-        }
-
-        .tab-button {
-            padding: 12px 20px;
-            background: none;
-            border: none;
-            color: white;
-            cursor: pointer;
-            transition: background-color 0.3s;
-            font-size: 14px;
+        .content-header {
+            padding: 15px 20px;
+            background-color: #f8f9fa;
+            border-bottom: 1px solid #e0e0e0;
             display: flex;
             align-items: center;
-            gap: 5px;
+            justify-content: space-between;
         }
 
-        .tab-button.active {
-            background-color: #1557b0;
+        .content-title {
+            font-size: 18px;
+            font-weight: 600;
+            color: #333;
         }
 
         .tab-content {
             display: none;
-            padding: 15px;
+            padding: 20px;
             overflow-y: auto;
             flex: 1;
         }
@@ -481,14 +464,8 @@
                 display: none;
             }
             
-            .container {
+            .main-content {
                 height: auto;
-            }
-            
-            .tab-button {
-                flex: 1;
-                padding: 10px;
-                font-size: 12px;
             }
             
             .input-section {
@@ -519,19 +496,19 @@
         </div>
         
         <div class="nav-menu">
-            <div class="menu-item" onclick="setActive(this)">
+            <div class="menu-item" onclick="setActive(this); showTab('dashboard')">
                 <div class="menu-icon"><i class="fas fa-home"></i></div>
                 <div class="menu-text">Dashboard</div>
                 <div class="menu-chevron"><i class="fas fa-chevron-down"></i></div>
             </div>
             
-            <div class="menu-item" onclick="setActive(this)">
+            <div class="menu-item" onclick="setActive(this); showTab('calendar')">
                 <div class="menu-icon"><i class="fas fa-calendar-alt"></i></div>
                 <div class="menu-text">Calendar</div>
                 <div class="menu-chevron"><i class="fas fa-chevron-down"></i></div>
             </div>
             
-            <div class="menu-item active" onclick="setActive(this); openTab('processes')">
+            <div class="menu-item active" onclick="setActive(this); showTab('processes')">
                 <div class="menu-icon"><i class="fas fa-project-diagram"></i></div>
                 <div class="menu-text">Processes</div>
                 <div class="menu-chevron"><i class="fas fa-chevron-down"></i></div>
@@ -539,7 +516,7 @@
             
             <div class="divider"></div>
             
-            <div class="menu-item" onclick="setActive(this)">
+            <div class="menu-item" onclick="setActive(this); showTab('settings')">
                 <div class="menu-icon"><i class="fas fa-cog"></i></div>
                 <div class="menu-text">Settings</div>
                 <div class="menu-chevron"><i class="fas fa-chevron-down"></i></div>
@@ -548,42 +525,56 @@
     </div>
 
     <div class="main-content">
-        <div class="container">
-            <div class="tabs">
-                <button class="tab-button active" onclick="openTab('processes')">
-                    <i class="fas fa-project-diagram"></i> Processes
+        <div class="content-header">
+            <div class="content-title" id="contentTitle">Processes</div>
+            <div class="search-container" id="searchContainer">
+                <input type="text" class="search-bar" id="processSearch" placeholder="Search processes..." oninput="searchProcesses()">
+            </div>
+        </div>
+
+        <!-- Dashboard Tab -->
+        <div id="dashboard" class="tab-content">
+            <h2>Dashboard Content</h2>
+            <p>This would contain your dashboard information and metrics.</p>
+        </div>
+
+        <!-- Calendar Tab -->
+        <div id="calendar" class="tab-content">
+            <h2>Calendar Content</h2>
+            <p>This would contain your calendar view and scheduling tools.</p>
+        </div>
+
+        <!-- Processes Tab -->
+        <div id="processes" class="tab-content active">
+            <div style="display: flex; align-items: center; margin-bottom: 15px;">
+                <button class="new-item-btn" onclick="toggleInputs('processes')">
+                    <i class="fas fa-plus"></i> New Process
                 </button>
             </div>
-
-            <!-- Processes Tab -->
-            <div id="processes" class="tab-content active">
-                <div style="display: flex; align-items: center; margin-bottom: 15px;">
-                    <button class="new-item-btn" onclick="toggleInputs('processes')">
-                        <i class="fas fa-plus"></i> New Process
-                    </button>
-                    <div class="search-container">
-                        <input type="text" class="search-bar" id="processSearch" placeholder="Search processes..." oninput="searchProcesses()">
-                    </div>
+            
+            <div class="input-section collapsed">
+                <div class="input-group">
+                    <input type="text" id="processTitle" placeholder="Process title">
                 </div>
+                <button onclick="addProcess()">Add Process</button>
                 
-                <div class="input-section collapsed">
-                    <div class="input-group">
-                        <input type="text" id="processTitle" placeholder="Process title">
-                    </div>
-                    <button onclick="addProcess()">Add Process</button>
-                    
-                    <div class="notes-container">
-                        <textarea id="processSteps" class="large-notes" placeholder="Step-by-step instructions..."></textarea>
-                    </div>
+                <div class="notes-container">
+                    <textarea id="processSteps" class="large-notes" placeholder="Step-by-step instructions..."></textarea>
                 </div>
-                
-                <div class="new-subheading-bar">
-                    <input type="text" id="newProcessSubheading" class="new-subheading-input" placeholder="New subheading name">
-                    <button onclick="addSubheading('process')">Add</button>
-                </div>
-                
-                <div id="processesList"></div>
             </div>
+            
+            <div class="new-subheading-bar">
+                <input type="text" id="newProcessSubheading" class="new-subheading-input" placeholder="New subheading name">
+                <button onclick="addSubheading('process')">Add</button>
+            </div>
+            
+            <div id="processesList"></div>
+        </div>
+
+        <!-- Settings Tab -->
+        <div id="settings" class="tab-content">
+            <h2>Settings</h2>
+            <p>This would contain your application settings and configuration options.</p>
         </div>
     </div>
 
@@ -599,19 +590,34 @@
             clickedItem.classList.add('active');
         }
 
+        function showTab(tabName) {
+            // Hide all tab contents
+            document.querySelectorAll('.tab-content').forEach(tab => {
+                tab.classList.remove('active');
+            });
+            
+            // Show the selected tab
+            document.getElementById(tabName).classList.add('active');
+            
+            // Update the content title
+            const titleMap = {
+                'dashboard': 'Dashboard',
+                'calendar': 'Calendar',
+                'processes': 'Processes',
+                'settings': 'Settings'
+            };
+            
+            document.getElementById('contentTitle').textContent = titleMap[tabName];
+            
+            // Show/hide search bar based on tab
+            document.getElementById('searchContainer').style.display = 
+                tabName === 'processes' ? 'inline-flex' : 'none';
+        }
+
         // Data Management
         let processes = JSON.parse(localStorage.getItem('processes')) || [];
         let processSubheadings = JSON.parse(localStorage.getItem('processSubheadings')) || ['General'];
         let collapsedSubheadings = JSON.parse(localStorage.getItem('collapsedSubheadings')) || {};
-
-        // Tab Navigation
-        function openTab(tabName) {
-            document.querySelectorAll('.tab-content').forEach(tab => tab.classList.remove('active'));
-            document.querySelectorAll('.tab-button').forEach(btn => btn.classList.remove('active'));
-            
-            document.getElementById(tabName).classList.add('active');
-            event.currentTarget.classList.add('active');
-        }
 
         // Toggle input sections
         function toggleInputs(tab) {
@@ -950,13 +956,15 @@
         // Initialization
         window.onload = () => {
             renderProcesses();
-            openTab('processes');
             
             // Collapse input section by default
             document.querySelector('.input-section').classList.add('collapsed');
             
-            // Set Processes menu item as active
+            // Set Processes menu item as active by default
             document.querySelector('.menu-item:nth-child(3)').classList.add('active');
+            
+            // Only show search bar for processes tab
+            document.getElementById('searchContainer').style.display = 'inline-flex';
         };
     </script>
 </body>
