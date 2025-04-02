@@ -271,6 +271,23 @@
             border-radius: 4px;
         }
 
+        .revision-date-container {
+            margin: 5px 0;
+            font-size: 13px;
+            color: #666;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .revision-date-container input {
+            padding: 4px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 12px;
+            width: 150px;
+        }
+
         .delete-btn {
             background-color: #dc3545;
             padding: 6px 12px;
@@ -495,6 +512,10 @@
 
             .process-title {
                 width: 100% !important;
+            }
+
+            .revision-date-container input {
+                width: 100%;
             }
 
             .revision-date-input {
@@ -855,10 +876,10 @@
             processElement.setAttribute('data-id', process.id);
             
             // Format revision date for display if it exists
-            let revisionDateDisplay = '';
+            let revisionDateValue = '';
             if (process.revisionDate) {
                 const date = new Date(process.revisionDate);
-                revisionDateDisplay = ` (Last Revised: ${date.toLocaleDateString()})`;
+                revisionDateValue = date.toISOString().split('T')[0]; // YYYY-MM-DD format for input
             }
             
             // Subheading selector
@@ -870,13 +891,19 @@
                 <div class="process-header">
                     <span class="process-title" contenteditable="true" 
                           oninput="updateProcessField(${process.id}, 'title', this.innerText)">
-                        ${process.title}${revisionDateDisplay}
+                        ${process.title}
                     </span>
                     <div class="process-controls">
                         <button class="delete-btn" onclick="confirmDelete('process', ${process.id})">
                             <i class="fas fa-trash"></i>
                         </button>
                     </div>
+                </div>
+                <div class="revision-date-container">
+                    <span>Last Revised: </span>
+                    <input type="date" class="revision-date-input" 
+                           value="${revisionDateValue}"
+                           onchange="updateProcessField(${process.id}, 'revisionDate', this.value ? new Date(this.value).toISOString() : null)">
                 </div>
                 <div class="process-subheading-selector">
                     <select onchange="updateProcessField(${process.id}, 'subheading', this.value)">
