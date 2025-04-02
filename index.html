@@ -222,7 +222,7 @@
             color: #555;
         }
 
-        input, select, textarea {
+        input, select {
             padding: 8px;
             border: 1px solid #ddd;
             border-radius: 4px;
@@ -334,14 +334,22 @@
             max-height: 1000px;
         }
 
-        .process-content {
+        .process-instructions {
             width: 100%;
             min-height: 120px;
             padding: 8px;
             border: 1px solid #ddd;
             border-radius: 4px;
-            resize: vertical;
             font-size: 13px;
+            white-space: pre-wrap;
+            word-wrap: break-word;
+            overflow-y: auto;
+            background-color: white;
+        }
+
+        .process-instructions:empty::before {
+            content: "Enter step-by-step instructions...";
+            color: #999;
         }
 
         .process-controls {
@@ -432,16 +440,6 @@
 
         .collapsible-content.collapsed {
             max-height: 0;
-        }
-
-        .large-notes {
-            width: 100%;
-            min-height: 150px;
-            padding: 10px;
-            border: 1px solid #ddd;
-            border-radius: 4px;
-            resize: vertical;
-            font-size: 14px;
         }
 
         .revision-date-input {
@@ -602,7 +600,11 @@
                     </div>
                 </div>
                 <div class="input-group">
-                    <textarea id="processSteps" class="large-notes" placeholder="Step-by-step instructions..."></textarea>
+                    <div 
+                        id="processStepsInput" 
+                        class="process-instructions" 
+                        contenteditable="true"
+                        placeholder="Step-by-step instructions..."></div>
                 </div>
             </div>
             
@@ -624,35 +626,25 @@
     <script>
         // Sidebar functionality
         function setActive(clickedItem) {
-            // Remove active class from all items
             document.querySelectorAll('.menu-item').forEach(item => {
                 item.classList.remove('active');
             });
-            
-            // Add active class to clicked item
             clickedItem.classList.add('active');
         }
 
         function showTab(tabName) {
-            // Hide all tab contents
             document.querySelectorAll('.tab-content').forEach(tab => {
                 tab.classList.remove('active');
             });
-            
-            // Show the selected tab
             document.getElementById(tabName).classList.add('active');
             
-            // Update the content title
             const titleMap = {
                 'dashboard': 'Dashboard',
                 'calendar': 'Calendar',
                 'processes': 'Processes',
                 'settings': 'Settings'
             };
-            
             document.getElementById('contentTitle').textContent = titleMap[tabName];
-            
-            // Show/hide search bar based on tab
             document.getElementById('searchContainer').style.display = 
                 tabName === 'processes' ? 'inline-flex' : 'none';
         }
@@ -668,49 +660,35 @@
             const toggleBtn = document.querySelector(`#${tab} .new-item-btn`);
             
             inputSection.classList.toggle('collapsed');
-            
-            if (inputSection.classList.contains('collapsed')) {
-                toggleBtn.innerHTML = '<i class="fas fa-plus"></i> New Process';
-            } else {
-                toggleBtn.innerHTML = 'Hide Form';
-            }
+            toggleBtn.innerHTML = inputSection.classList.contains('collapsed') 
+                ? '<i class="fas fa-plus"></i> New Process' 
+                : 'Hide Form';
         }
 
         // Subheading functions
         function renderSubheadings(type) {
             const listContainer = document.getElementById('processesList');
-            const subheadings = processSubheadings;
-            
-            // Clear the container
             listContainer.innerHTML = '';
             
-            subheadings.forEach((subheading, index) => {
-                // Render items for this subheading in the list container
+            processSubheadings.forEach((subheading, index) => {
                 renderItemsForSubheading(type, subheading, listContainer, index);
             });
         }
 
         function renderItemsForSubheading(type, subheading, container, index) {
             let items = processes.filter(p => p.subheading === subheading);
-            
             if (items.length === 0) return;
             
-            // Check if this subheading is collapsed
             const isCollapsed = collapsedSubheadings[`${type}-${subheading}`] || false;
             
-            // Add subheading label
             const subheadingElement = document.createElement('div');
             subheadingElement.className = 'subheading';
             subheadingElement.onclick = (e) => {
-                // Don't toggle if clicking on controls
                 if (e.target.closest('.subheading-controls')) return;
-                
                 const key = `${type}-${subheading}`;
                 collapsedSubheadings[key] = !collapsedSubheadings[key];
                 localStorage.setItem('collapsedSubheadings', JSON.stringify(collapsedSubheadings));
-                
-                const content = subheadingElement.nextElementSibling;
-                content.classList.toggle('collapsed');
+                subheadingElement.nextElementSibling.classList.toggle('collapsed');
             };
             
             const input = document.createElement('input');
@@ -753,121 +731,18 @@
             controls.appendChild(upBtn);
             controls.appendChild(downBtn);
             controls.appendChild(removeBtn);
-            
             subheadingElement.appendChild(input);
             subheadingElement.appendChild(controls);
             
-            // Create content container
             const contentContainer = document.createElement('div');
             contentContainer.className = `collapsible-content ${isCollapsed ? 'collapsed' : ''}`;
             
-            // Add items
             items.forEach(item => {
-                const element = createProcessElement(item);
-                contentContainer.appendChild(element);
+                contentContainer.appendChild(createProcessElement(item));
             });
             
             container.appendChild(subheadingElement);
             container.appendChild(contentContainer);
-        }
-
-        function moveSubheading(type, index, direction) {
-            if (direction === 'up' && index > 0) {
-                [processSubheadings[index], processSubheadings[index - 1]] = [processSubheadings[index - 1], processSubheadings[index]];
-            } else if (direction === 'down' && index < processSubheadings.length - 1) {
-                [processSubheadings[index], processSubheadings[index + 1]] = [processSubheadings[index + 1], processSubheadings[index]];
-            }
-            
-            saveSubheadings(type);
-            renderSubheadings(type);
-        }
-
-        function updateSubheading(type, index, value) {
-            const oldValue = processSubheadings[index];
-            processSubheadings[index] = value;
-            
-            // Update all items with the old subheading
-            processes.forEach(process => {
-                if (process.subheading === oldValue) {
-                    process.subheading = value;
-                }
-            });
-            saveProcesses();
-            
-            saveSubheadings(type);
-            renderSubheadings(type);
-        }
-
-        function addSubheading(type) {
-            const inputId = `new${type.charAt(0).toUpperCase() + type.slice(1)}Subheading`;
-            const newSubheading = document.getElementById(inputId).value.trim();
-            
-            if (!newSubheading) return;
-            
-            if (!processSubheadings.includes(newSubheading)) {
-                processSubheadings.push(newSubheading);
-                document.getElementById(inputId).value = '';
-                saveSubheadings(type);
-                renderSubheadings(type);
-            }
-        }
-
-        function removeSubheading(type, index) {
-            if (processSubheadings.length <= 1) return;
-            
-            if (!confirm(`Are you sure you want to delete the "${processSubheadings[index]}" subheading? All items in this subheading will be moved to "${processSubheadings[0]}"`)) {
-                return;
-            }
-            
-            // Move items from this subheading to the first subheading
-            const subheadingToRemove = processSubheadings[index];
-            processes.forEach(process => {
-                if (process.subheading === subheadingToRemove) {
-                    process.subheading = processSubheadings[0];
-                }
-            });
-            saveProcesses();
-            
-            // Remove from collapsed state tracking
-            const key = `${type}-${subheadingToRemove}`;
-            if (collapsedSubheadings[key]) {
-                delete collapsedSubheadings[key];
-            }
-            
-            processSubheadings.splice(index, 1);
-            saveSubheadings(type);
-            renderSubheadings(type);
-        }
-
-        function saveSubheadings(type) {
-            localStorage.setItem('processSubheadings', JSON.stringify(processSubheadings));
-        }
-
-        // Process Functions
-        function addProcess() {
-            const revisionDateInput = document.getElementById('revisionDate');
-            const revisionDate = revisionDateInput.value ? new Date(revisionDateInput.value).toISOString() : null;
-            
-            const process = {
-                id: Date.now(),
-                title: document.getElementById('processTitle').value.trim(),
-                revisionDate: revisionDate,
-                steps: document.getElementById('processSteps').value,
-                created: new Date().toISOString(),
-                updated: new Date().toISOString(),
-                subheading: processSubheadings[0]
-            };
-
-            if (!process.title) return;
-
-            processes.push(process);
-            saveProcesses();
-            renderProcesses();
-            clearProcessForm();
-        }
-
-        function renderProcesses(filteredProcesses = processes) {
-            renderSubheadings('process');
         }
 
         function createProcessElement(process) {
@@ -875,14 +750,12 @@
             processElement.className = 'process-item';
             processElement.setAttribute('data-id', process.id);
             
-            // Format revision date for display if it exists
             let revisionDateValue = '';
             if (process.revisionDate) {
                 const date = new Date(process.revisionDate);
-                revisionDateValue = date.toISOString().split('T')[0]; // YYYY-MM-DD format for input
+                revisionDateValue = date.toISOString().split('T')[0];
             }
             
-            // Subheading selector
             const subheadingOptions = processSubheadings.map(sh => 
                 `<option value="${sh}" ${process.subheading === sh ? 'selected' : ''}>${sh}</option>`
             ).join('');
@@ -914,117 +787,91 @@
                     Steps
                 </div>
                 <div class="notes-content">
-                    <textarea oninput="updateProcessField(${process.id}, 'steps', this.value)"
-                              style="width:100%; min-height: 120px;">
-                        ${process.steps}
-                    </textarea>
+                    <div class="process-instructions" 
+                         contenteditable="true"
+                         oninput="updateProcessField(${process.id}, 'steps', this.innerText)">
+                         ${process.steps.replace(/\n/g, '<br>')}
+                    </div>
                 </div>
                 <div class="move-buttons">
                     <button onclick="moveProcess(${process.id}, 'up')">↑</button>
                     <button onclick="moveProcess(${process.id}, 'down')">↓</button>
                 </div>
             `;
+
+            // Add paste event handler for instructions
+            const instructionsDiv = processElement.querySelector('.process-instructions');
+            instructionsDiv.addEventListener('paste', (e) => {
+                e.preventDefault();
+                const text = (e.clipboardData || window.clipboardData).getData('text/plain');
+                document.execCommand('insertText', false, text);
+            });
+
             return processElement;
         }
 
-        function moveProcess(id, direction) {
-            const index = processes.findIndex(p => p.id === id);
-            if (direction === 'up' && index > 0) {
-                [processes[index], processes[index - 1]] = [processes[index - 1], processes[index]];
-            } else if (direction === 'down' && index < processes.length - 1) {
-                [processes[index], processes[index + 1]] = [processes[index + 1], processes[index]];
-            }
+        // Process Functions
+        function addProcess() {
+            const revisionDateInput = document.getElementById('revisionDate');
+            const revisionDate = revisionDateInput.value ? new Date(revisionDateInput.value).toISOString() : null;
+            const stepsInput = document.getElementById('processStepsInput');
+            
+            const process = {
+                id: Date.now(),
+                title: document.getElementById('processTitle').value.trim(),
+                revisionDate: revisionDate,
+                steps: stepsInput.innerText.replace(/\n/g, '<br>'),
+                created: new Date().toISOString(),
+                updated: new Date().toISOString(),
+                subheading: processSubheadings[0]
+            };
+
+            if (!process.title) return;
+
+            processes.push(process);
             saveProcesses();
             renderProcesses();
+            clearProcessForm();
         }
 
-        // Common Functions
-        function confirmDelete(type, id) {
-            if (window.confirm(`Are you sure you want to delete this ${type}?`)) {
-                deleteProcess(id);
-            }
-        }
-
-        function deleteProcess(id) {
-            processes = processes.filter(p => p.id !== id);
-            saveProcesses();
-            renderProcesses();
+        function renderProcesses(filteredProcesses = processes) {
+            renderSubheadings('process');
         }
 
         function updateProcessField(id, field, value) {
             const process = processes.find(p => p.id === id);
             if (process) {
-                process[field] = value;
+                process[field] = field === 'steps' ? value.replace(/<br>/g, '\n') : value;
                 process.updated = new Date().toISOString();
                 saveProcesses();
-                if (field === 'subheading') {
-                    renderProcesses();
-                }
-                if (field === 'title') {
-                    // Update any sidebar or other references if needed
-                }
+                if (field === 'subheading') renderProcesses();
             }
         }
 
         function toggleNotes(header) {
-            const content = header.nextElementSibling;
-            content.classList.toggle('expanded');
+            header.nextElementSibling.classList.toggle('expanded');
         }
 
-        function searchProcesses() {
-            const searchTerm = document.getElementById('processSearch').value.toLowerCase();
-            const filtered = processes.filter(p => 
-                p.title.toLowerCase().includes(searchTerm) ||
-                p.steps.toLowerCase().includes(searchTerm)
-            );
-            
-            const processesList = document.getElementById('processesList');
-            processesList.innerHTML = '';
-            
-            // Group by subheading
-            const grouped = {};
-            filtered.forEach(process => {
-                if (!grouped[process.subheading]) {
-                    grouped[process.subheading] = [];
-                }
-                grouped[process.subheading].push(process);
-            });
-            
-            // Render each group
-            for (const [subheading, items] of Object.entries(grouped)) {
-                const subheadingElement = document.createElement('div');
-                subheadingElement.className = 'subheading';
-                subheadingElement.textContent = subheading;
-                processesList.appendChild(subheadingElement);
-                
-                items.forEach(process => {
-                    const processElement = createProcessElement(process);
-                    processesList.appendChild(processElement);
-                });
-            }
-        }
-
-        // Form Clearing
+        // Utility Functions
         function clearProcessForm() {
             document.getElementById('processTitle').value = '';
             document.getElementById('revisionDate').value = '';
-            document.getElementById('processSteps').value = '';
+            document.getElementById('processStepsInput').innerHTML = '';
         }
 
-        // Storage
-        function saveProcesses() { localStorage.setItem('processes', JSON.stringify(processes)); }
+        function saveProcesses() { 
+            localStorage.setItem('processes', JSON.stringify(processes)); 
+        }
+
+        function saveSubheadings(type) {
+            localStorage.setItem('processSubheadings', JSON.stringify(processSubheadings));
+        }
 
         // Initialization
         window.onload = () => {
             renderProcesses();
-            
-            // Collapse input section by default
             document.querySelector('.input-section').classList.add('collapsed');
-            
-            // Set Processes menu item as active by default
             document.querySelector('.menu-item:nth-child(3)').classList.add('active');
-            
-            // Only show search bar for processes tab
             document.getElementById('searchContainer').style.display = 'inline-flex';
         };
     </script>
