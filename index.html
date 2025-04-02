@@ -427,6 +427,10 @@
             font-size: 14px;
         }
 
+        .revision-date-input {
+            width: 200px;
+        }
+
         @media (max-width: 768px) {
             body {
                 flex-direction: column;
@@ -491,6 +495,10 @@
 
             .process-title {
                 width: 100% !important;
+            }
+
+            .revision-date-input {
+                width: 100%;
             }
         }
     </style>
@@ -565,6 +573,12 @@
                         <input type="text" id="processTitle" placeholder="Process title">
                     </div>
                     <button onclick="addProcess()">Add Process</button>
+                </div>
+                <div class="input-row">
+                    <div class="input-group">
+                        <label for="revisionDate">Most Recent Revision Date (optional)</label>
+                        <input type="date" id="revisionDate" class="revision-date-input">
+                    </div>
                 </div>
                 <div class="input-group">
                     <textarea id="processSteps" class="large-notes" placeholder="Step-by-step instructions..."></textarea>
@@ -810,9 +824,13 @@
 
         // Process Functions
         function addProcess() {
+            const revisionDateInput = document.getElementById('revisionDate');
+            const revisionDate = revisionDateInput.value ? new Date(revisionDateInput.value).toISOString() : null;
+            
             const process = {
                 id: Date.now(),
                 title: document.getElementById('processTitle').value.trim(),
+                revisionDate: revisionDate,
                 steps: document.getElementById('processSteps').value,
                 created: new Date().toISOString(),
                 updated: new Date().toISOString(),
@@ -836,6 +854,13 @@
             processElement.className = 'process-item';
             processElement.setAttribute('data-id', process.id);
             
+            // Format revision date for display if it exists
+            let revisionDateDisplay = '';
+            if (process.revisionDate) {
+                const date = new Date(process.revisionDate);
+                revisionDateDisplay = ` (Last Revised: ${date.toLocaleDateString()})`;
+            }
+            
             // Subheading selector
             const subheadingOptions = processSubheadings.map(sh => 
                 `<option value="${sh}" ${process.subheading === sh ? 'selected' : ''}>${sh}</option>`
@@ -845,7 +870,7 @@
                 <div class="process-header">
                     <span class="process-title" contenteditable="true" 
                           oninput="updateProcessField(${process.id}, 'title', this.innerText)">
-                        ${process.title}
+                        ${process.title}${revisionDateDisplay}
                     </span>
                     <div class="process-controls">
                         <button class="delete-btn" onclick="confirmDelete('process', ${process.id})">
@@ -955,6 +980,7 @@
         // Form Clearing
         function clearProcessForm() {
             document.getElementById('processTitle').value = '';
+            document.getElementById('revisionDate').value = '';
             document.getElementById('processSteps').value = '';
         }
 
