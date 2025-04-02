@@ -922,12 +922,9 @@
             
             const newIndex = direction === 'up' ? index - 1 : index + 1;
             
-            // Only move if in the same subheading
-            if (processes[index].subheading === processes[newIndex].subheading) {
-                [processes[index], processes[newIndex]] = [processes[newIndex], processes[index]];
-                saveProcesses();
-                renderProcesses();
-            }
+            [processes[index], processes[newIndex]] = [processes[newIndex], processes[index]];
+            saveProcesses();
+            renderProcesses();
         }
 
         function confirmDelete(type, id) {
