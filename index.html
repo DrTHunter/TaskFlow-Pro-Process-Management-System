@@ -666,6 +666,69 @@
         }
 
         // Subheading functions
+        function addSubheading(type) {
+            const input = document.getElementById('newProcessSubheading');
+            const name = input.value.trim();
+            
+            if (!name || processSubheadings.includes(name)) return;
+            
+            processSubheadings.push(name);
+            saveSubheadings(type);
+            input.value = '';
+            renderProcesses();
+        }
+
+        function updateSubheading(type, index, newName) {
+            newName = newName.trim();
+            if (!newName || processSubheadings[index] === newName) return;
+            
+            // Update all processes with the old subheading name
+            processes.forEach(process => {
+                if (process.subheading === processSubheadings[index]) {
+                    process.subheading = newName;
+                }
+            });
+            
+            processSubheadings[index] = newName;
+            saveSubheadings(type);
+            saveProcesses();
+            renderProcesses();
+        }
+
+        function moveSubheading(type, index, direction) {
+            if ((direction === 'up' && index === 0) || 
+                (direction === 'down' && index === processSubheadings.length - 1)) {
+                return;
+            }
+            
+            const newIndex = direction === 'up' ? index - 1 : index + 1;
+            [processSubheadings[index], processSubheadings[newIndex]] = 
+                [processSubheadings[newIndex], processSubheadings[index]];
+            
+            saveSubheadings(type);
+            renderProcesses();
+        }
+
+        function removeSubheading(type, index) {
+            if (processSubheadings.length <= 1) return;
+            
+            const subheadingToRemove = processSubheadings[index];
+            const defaultSubheading = processSubheadings[0] === subheadingToRemove ? 
+                processSubheadings[1] : processSubheadings[0];
+            
+            // Move all processes to the default subheading
+            processes.forEach(process => {
+                if (process.subheading === subheadingToRemove) {
+                    process.subheading = defaultSubheading;
+                }
+            });
+            
+            processSubheadings.splice(index, 1);
+            saveSubheadings(type);
+            saveProcesses();
+            renderProcesses();
+        }
+
         function renderSubheadings(type) {
             const listContainer = document.getElementById('processesList');
             listContainer.innerHTML = '';
@@ -848,8 +911,52 @@
             }
         }
 
+        function moveProcess(id, direction) {
+            const index = processes.findIndex(p => p.id === id);
+            if (index === -1) return;
+            
+            if ((direction === 'up' && index === 0) || 
+                (direction === 'down' && index === processes.length - 1)) {
+                return;
+            }
+            
+            const newIndex = direction === 'up' ? index - 1 : index + 1;
+            
+            // Only move if in the same subheading
+            if (processes[index].subheading === processes[newIndex].subheading) {
+                [processes[index], processes[newIndex]] = [processes[newIndex], processes[index]];
+                saveProcesses();
+                renderProcesses();
+            }
+        }
+
+        function confirmDelete(type, id) {
+            if (confirm('Are you sure you want to delete this item?')) {
+                if (type === 'process') {
+                    processes = processes.filter(p => p.id !== id);
+                    saveProcesses();
+                    renderProcesses();
+                }
+            }
+        }
+
         function toggleNotes(header) {
             header.nextElementSibling.classList.toggle('expanded');
+        }
+
+        function searchProcesses() {
+            const searchTerm = document.getElementById('processSearch').value.toLowerCase();
+            if (!searchTerm) {
+                renderProcesses();
+                return;
+            }
+            
+            const filtered = processes.filter(p => 
+                p.title.toLowerCase().includes(searchTerm) || 
+                p.steps.toLowerCase().includes(searchTerm)
+            );
+            
+            renderProcesses(filtered);
         }
 
         // Utility Functions
