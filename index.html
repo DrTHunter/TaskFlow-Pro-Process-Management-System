@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Hover-Expand Sidebar with Tasks</title>
+    <title>Process Management System</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         * {
@@ -147,14 +147,57 @@
             width: 80%;
         }
 
-        /* Task Content Styles */
-        .content {
+        /* Main Content Styles */
+        .main-content {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
+            overflow: hidden;
+        }
+
+        .container {
             flex: 1;
             background-color: white;
-            height: 100vh;
+            height: calc(100vh - 40px);
             display: flex;
             flex-direction: column;
             overflow: hidden;
+        }
+
+        .tabs {
+            display: flex;
+            background-color: #1a73e8;
+            flex-wrap: wrap;
+            position: relative;
+        }
+
+        .tab-button {
+            padding: 12px 20px;
+            background: none;
+            border: none;
+            color: white;
+            cursor: pointer;
+            transition: background-color 0.3s;
+            font-size: 14px;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .tab-button.active {
+            background-color: #1557b0;
+        }
+
+        .tab-content {
+            display: none;
+            padding: 15px;
+            overflow-y: auto;
+            flex: 1;
+        }
+
+        .tab-content.active {
+            display: block;
         }
 
         .input-section {
@@ -167,7 +210,6 @@
             align-items: flex-end;
             border-bottom: 1px solid #ddd;
             padding-bottom: 15px;
-            margin: 15px;
         }
 
         .input-section.collapsed {
@@ -177,27 +219,6 @@
             visibility: hidden;
             border-bottom: none;
             padding-bottom: 0;
-        }
-
-        .wide-input-section {
-            display: flex;
-            flex-wrap: wrap;
-            align-items: flex-end;
-        }
-
-        .wide-input-section .input-group:first-child {
-            flex: 3;
-            min-width: 300px;
-        }
-
-        .wide-input-section .input-group:not(:first-child) {
-            flex: 1;
-            min-width: 150px;
-        }
-
-        .wide-input-section button {
-            margin-left: auto;
-            height: 36px;
         }
 
         .input-group {
@@ -236,16 +257,7 @@
             filter: brightness(0.9);
         }
 
-        .task-list {
-            background-color: #f8f9fa;
-            border-radius: 5px;
-            padding: 10px;
-            margin: 15px;
-            flex: 1;
-            overflow-y: auto;
-        }
-
-        .task-item {
+        .process-item {
             padding: 12px;
             background-color: white;
             margin-bottom: 8px;
@@ -254,79 +266,46 @@
             position: relative;
         }
 
-        .priority-high { border-left: 4px solid #dc3545; }
-        .priority-medium { border-left: 4px solid #ffc107; }
-        .priority-low { border-left: 4px solid #28a745; }
-
-        .completed {
-            opacity: 0.7;
-            background-color: #f8f9fa;
-        }
-
-        .task-header {
+        .process-header {
             display: flex;
             align-items: center;
-            margin-bottom: 10px;
-            gap: 20px;
-            flex-wrap: wrap;
+            gap: 10px;
         }
 
-        .task-title {
-            font-weight: bold;
-            flex: 2;
-            min-width: 200px;
+        .process-title {
+            width: 50%;
+            max-width: 50%;
             word-wrap: break-word;
             min-height: 20px;
             padding: 5px;
             border: none;
             border-radius: 4px;
-            width: 65%;
         }
 
-        .complete-checkbox {
+        .delete-btn {
+            background-color: #dc3545;
+            padding: 6px 12px;
+        }
+
+        .move-buttons {
+            position: absolute;
+            top: 50px;
+            right: 12px;
             display: flex;
-            align-items: center;
             gap: 5px;
-            white-space: nowrap;
-            margin-left: 0;
-            flex-shrink: 1;
-            min-width: 0;
-            overflow: hidden;
-            flex: 1;
         }
 
-        .current-step {
-            margin-top: 5px;
-            width: 65%;
-            min-height: 40px;
-            max-height: 200px;
-            padding: 5px;
-            border: 1px solid #ddd;
-            border-radius: 4px;
-            resize: none;
-            font-size: 13px;
-            line-height: 1.4;
-            overflow-y: hidden;
-            word-wrap: break-word;
-        }
-
-        .task-meta {
-            display: flex;
-            gap: 15px;
-            margin-top: 8px;
-            font-size: 0.85em;
-            color: #666;
-            flex-wrap: wrap;
+        .search-container {
+            display: inline-flex;
+            flex-grow: 1;
+            margin-bottom: 0;
             align-items: center;
-            justify-content: space-between;
         }
 
-        .task-meta-item {
-            display: flex;
-            align-items: center;
-            gap: 5px;
-            flex: 1;
-            min-width: 120px;
+        .search-bar {
+            flex-grow: 1;
+            max-width: 400px;
+            margin-left: 10px;
         }
 
         .notes-header {
@@ -349,97 +328,31 @@
             max-height: 1000px;
         }
 
-        .task-controls {
+        .process-content {
+            width: 100%;
+            min-height: 120px;
+            padding: 8px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            resize: vertical;
+            font-size: 13px;
+        }
+
+        .process-controls {
             position: absolute;
             top: 12px;
             right: 12px;
             display: flex;
             gap: 8px;
             align-items: center;
-            flex: 0;
         }
 
-        .delete-btn {
-            background-color: #dc3545;
-            padding: 6px 12px;
-        }
-
-        .move-buttons {
-            position: absolute;
-            top: 50px;
-            right: 12px;
-            display: flex;
-            gap: 5px;
-        }
-
-        .search-container {
-            display: flex;
-            margin: 15px;
-            align-items: center;
-        }
-
-        .search-bar {
-            flex-grow: 1;
-            max-width: 400px;
-            margin-left: 10px;
-        }
-
-        .notes-container {
-            width: 100%;
-            margin-top: 15px;
-        }
-        
-        .large-notes {
-            width: 100%;
-            min-height: 150px;
-            padding: 10px;
-            border: 1px solid #ddd;
-            border-radius: 4px;
-            resize: vertical;
-            font-size: 14px;
-        }
-
-        .star-rating {
-            display: flex;
-            align-items: center;
-            gap: 5px;
-        }
-
-        .star-rating i {
-            color: #ddd;
-            cursor: pointer;
-            font-size: 18px;
-            transition: color 0.2s;
-        }
-
-        .star-rating i.active {
-            color: #ffc107;
-        }
-
-        .timeline-container {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-
-        .timeline-bar {
-            height: 6px;
-            width: 100px;
-            background-color: #e0e0e0;
-            border-radius: 3px;
-            overflow: hidden;
-            margin-bottom: 5px;
-        }
-
-        .timeline-progress {
-            height: 100%;
-            border-radius: 3px;
-            transition: width 0.5s ease, background-color 0.5s ease;
-        }
-
-        .timeline-dates {
-            font-size: 11px;
-            color: #666;
+        .new-item-btn {
+            min-width: 120px;
+            margin-right: 10px;
+            padding: 8px 15px;
+            font-size: 13px;
+            background-color: #28a745;
         }
 
         .subheading {
@@ -475,29 +388,16 @@
             margin-left: 10px;
         }
 
-        .subheading-selector {
+        .process-subheading-selector {
             position: absolute;
             right: 50px;
             top: 12px;
         }
 
-        .new-item-btn {
-            min-width: 120px;
-            margin-right: 10px;
-            padding: 8px 15px;
-            font-size: 13px;
-            background-color: #28a745;
-        }
-
-        .reset-btn {
-            background-color: #dc3545;
-            margin-top: 15px;
-        }
-
         .new-subheading-bar {
             display: flex;
             gap: 5px;
-            margin: 10px 15px;
+            margin: 10px 0;
             height: 30px;
             background-color: #e0e0e0;
             padding: 5px 10px;
@@ -528,62 +428,14 @@
             max-height: 0;
         }
 
-        .settings-menu {
-            display: none;
-            position: absolute;
-            right: 10px;
-            top: 50px;
-            background-color: white;
+        .large-notes {
+            width: 100%;
+            min-height: 150px;
+            padding: 10px;
             border: 1px solid #ddd;
             border-radius: 4px;
-            padding: 10px;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
-            z-index: 100;
-        }
-
-        .settings-menu.active {
-            display: block;
-        }
-
-        .color-picker {
-            display: flex;
-            gap: 5px;
-            margin-top: 5px;
-        }
-
-        .color-option {
-            width: 20px;
-            height: 20px;
-            border-radius: 50%;
-            cursor: pointer;
-            border: 2px solid transparent;
-        }
-
-        .color-option.selected {
-            border-color: #000;
-        }
-
-        /* Subheading controls spacing */
-        .subheading-controls {
-            gap: 8px !important;
-            margin-left: 15px !important;
-        }
-
-        /* Add button sizing */
-        .new-subheading-bar button {
-            height: 30px !important;
-            padding: 0 10px !important;
-            line-height: 30px !important;
-        }
-
-        .subheading-selector {
-            margin: 8px 0;
-            width: 100%;
-        }
-
-        .subheading-selector select {
-            width: 100%;
-            max-width: 200px;
+            resize: vertical;
+            font-size: 14px;
         }
 
         @media (max-width: 768px) {
@@ -592,51 +444,68 @@
                 height: auto;
             }
             
-            .content {
+            .sidebar {
+                width: 100%;
                 height: auto;
+                flex-direction: row;
+                padding: 10px;
+                align-items: center;
+            }
+            
+            .sidebar:hover {
+                width: 100%;
+                height: auto;
+            }
+            
+            .logo-container {
+                margin-bottom: 0;
+                margin-right: 20px;
+            }
+            
+            .nav-menu {
+                flex-direction: row;
+                overflow-x: auto;
+            }
+            
+            .menu-item {
+                margin-bottom: 0;
+                margin-right: 5px;
+                padding: 10px;
+            }
+            
+            .menu-text {
+                display: none !important;
+            }
+            
+            .divider {
+                display: none;
+            }
+            
+            .container {
+                height: auto;
+            }
+            
+            .tab-button {
+                flex: 1;
+                padding: 10px;
+                font-size: 12px;
             }
             
             .input-section {
                 flex-direction: column;
             }
             
-            .wide-input-section .input-group:first-child,
-            .wide-input-section .input-group:not(:first-child) {
-                flex: 1 0 100%;
-                min-width: 100%;
-            }
-            
-            .wide-input-section button {
-                margin-left: 0;
-                width: 100%;
-            }
-            
-            .task-meta {
-                flex-direction: column;
-                gap: 5px;
-            }
-            
             button {
                 padding: 6px 12px;
             }
 
-            .subheading-selector {
+            .process-subheading-selector {
                 position: static;
                 margin-top: 5px;
                 width: 100%;
             }
-            
-            .task-title {
-                width: 100% !important;
-            }
-            
-            .complete-checkbox {
-                margin-left: 0;
-                margin-top: 10px;
-                width: 100%;
-            }
-            
-            .current-step {
+
+            .process-title {
                 width: 100% !important;
             }
         }
@@ -646,31 +515,31 @@
     <div class="sidebar">
         <div class="logo-container">
             <div class="logo">S</div>
-            <div class="logo-text">Sidebar</div>
+            <div class="logo-text">Process Manager</div>
         </div>
         
         <div class="nav-menu">
-            <div class="menu-item" onclick="setActive(this, 'dashboard')">
+            <div class="menu-item" onclick="setActive(this)">
                 <div class="menu-icon"><i class="fas fa-home"></i></div>
                 <div class="menu-text">Dashboard</div>
                 <div class="menu-chevron"><i class="fas fa-chevron-down"></i></div>
             </div>
             
-            <div class="menu-item" onclick="setActive(this, 'calendar')">
+            <div class="menu-item" onclick="setActive(this)">
                 <div class="menu-icon"><i class="fas fa-calendar-alt"></i></div>
                 <div class="menu-text">Calendar</div>
                 <div class="menu-chevron"><i class="fas fa-chevron-down"></i></div>
             </div>
             
-            <div class="menu-item active" onclick="setActive(this, 'tasks')">
-                <div class="menu-icon"><i class="fas fa-tasks"></i></div>
-                <div class="menu-text">Tasks</div>
+            <div class="menu-item active" onclick="setActive(this); openTab('processes')">
+                <div class="menu-icon"><i class="fas fa-project-diagram"></i></div>
+                <div class="menu-text">Processes</div>
                 <div class="menu-chevron"><i class="fas fa-chevron-down"></i></div>
             </div>
             
             <div class="divider"></div>
             
-            <div class="menu-item" onclick="setActive(this, 'settings')">
+            <div class="menu-item" onclick="setActive(this)">
                 <div class="menu-icon"><i class="fas fa-cog"></i></div>
                 <div class="menu-text">Settings</div>
                 <div class="menu-chevron"><i class="fas fa-chevron-down"></i></div>
@@ -678,105 +547,49 @@
         </div>
     </div>
 
-    <div class="content" id="content">
-        <!-- Tasks Content (shown by default) -->
-        <div id="tasks-content">
-            <div style="display: flex; align-items: center; margin: 15px;">
-                <button class="new-item-btn" onclick="toggleInputs('tasks')">
-                    <i class="fas fa-plus"></i> New Task
+    <div class="main-content">
+        <div class="container">
+            <div class="tabs">
+                <button class="tab-button active" onclick="openTab('processes')">
+                    <i class="fas fa-project-diagram"></i> Processes
                 </button>
-                <div class="search-container">
-                    <input type="text" class="search-bar" id="taskSearch" placeholder="Search tasks..." oninput="searchTasks()">
-                </div>
-                <button class="settings-button" onclick="toggleSettingsMenu()" style="margin-left: auto;">
-                    <i class="fas fa-cog"></i>
-                </button>
-                <div class="settings-menu" id="settingsMenu">
-                    <button class="reset-btn" onclick="resetAllData()">
-                        Reset All Data
+            </div>
+
+            <!-- Processes Tab -->
+            <div id="processes" class="tab-content active">
+                <div style="display: flex; align-items: center; margin-bottom: 15px;">
+                    <button class="new-item-btn" onclick="toggleInputs('processes')">
+                        <i class="fas fa-plus"></i> New Process
                     </button>
-                </div>
-            </div>
-            
-            <div class="input-section collapsed wide-input-section">
-                <div class="input-group">
-                    <input type="text" id="taskTitle" placeholder="Task title">
-                </div>
-                <div class="input-group">
-                    <label for="taskStart">Start Date</label>
-                    <input type="date" id="taskStart">
-                </div>
-                <div class="input-group">
-                    <label for="taskDue">Due Date</label>
-                    <input type="date" id="taskDue">
-                </div>
-                <div class="input-group">
-                    <label>Priority</label>
-                    <div class="star-rating" id="priorityStars">
-                        <i class="fas fa-star" data-value="1"></i>
-                        <i class="fas fa-star" data-value="2"></i>
-                        <i class="fas fa-star" data-value="3"></i>
-                        <i class="fas fa-star" data-value="4"></i>
-                        <i class="fas fa-star" data-value="5"></i>
+                    <div class="search-container">
+                        <input type="text" class="search-bar" id="processSearch" placeholder="Search processes..." oninput="searchProcesses()">
                     </div>
                 </div>
-                <div class="input-group">
-                    <label>Color</label>
-                    <div class="color-picker" id="taskColorPicker">
-                        <div class="color-option selected" style="background-color: #1a73e8;" data-color="#1a73e8"></div>
-                        <div class="color-option" style="background-color: #dc3545;" data-color="#dc3545"></div>
-                        <div class="color-option" style="background-color: #28a745;" data-color="#28a745"></div>
-                        <div class="color-option" style="background-color: #ffc107;" data-color="#ffc107"></div>
-                        <div class="color-option" style="background-color: #6f42c1;" data-color="#6f42c1"></div>
-                    </div>
-                </div>
-                <button onclick="addTask()">Add Task</button>
                 
-                <div class="notes-container">
-                    <textarea id="taskNotes" class="large-notes" placeholder="Notes..."></textarea>
+                <div class="input-section collapsed">
+                    <div class="input-group">
+                        <input type="text" id="processTitle" placeholder="Process title">
+                    </div>
+                    <button onclick="addProcess()">Add Process</button>
+                    
+                    <div class="notes-container">
+                        <textarea id="processSteps" class="large-notes" placeholder="Step-by-step instructions..."></textarea>
+                    </div>
                 </div>
+                
+                <div class="new-subheading-bar">
+                    <input type="text" id="newProcessSubheading" class="new-subheading-input" placeholder="New subheading name">
+                    <button onclick="addSubheading('process')">Add</button>
+                </div>
+                
+                <div id="processesList"></div>
             </div>
-
-            <div class="new-subheading-bar">
-                <input type="text" id="newTaskSubheading" class="new-subheading-input" placeholder="New subheading name">
-                <button onclick="addSubheading('task')">Add</button>
-            </div>
-
-            <div class="task-list" id="tasksList">
-                <h3 class="current-header">Current Tasks</h3>
-                <div id="currentList"></div>
-                <h3 class="completed-header">Completed Tasks</h3>
-                <div id="doneList"></div>
-            </div>
-        </div>
-
-        <!-- Other content sections (hidden by default) -->
-        <div id="dashboard-content" style="display: none; padding: 20px;">
-            <h2>Dashboard Content</h2>
-            <p>This is the dashboard section.</p>
-        </div>
-
-        <div id="calendar-content" style="display: none; padding: 20px;">
-            <h2>Calendar Content</h2>
-            <p>This is the calendar section.</p>
-        </div>
-
-        <div id="settings-content" style="display: none; padding: 20px;">
-            <h2>Settings Content</h2>
-            <p>This is the settings section.</p>
         </div>
     </div>
 
     <script>
-        // Data Management
-        let tasks = JSON.parse(localStorage.getItem('tasks')) || [];
-        let selectedPriority = 1;
-        let selectedColor = '#1a73e8';
-        let taskSubheadings = JSON.parse(localStorage.getItem('taskSubheadings')) || ['General'];
-        let collapsedSubheadings = JSON.parse(localStorage.getItem('collapsedSubheadings')) || {};
-
         // Sidebar functionality
-        function setActive(clickedItem, section) {
+        function setActive(clickedItem) {
             // Remove active class from all items
             document.querySelectorAll('.menu-item').forEach(item => {
                 item.classList.remove('active');
@@ -784,76 +597,52 @@
             
             // Add active class to clicked item
             clickedItem.classList.add('active');
-            
-            // Hide all content sections
-            document.querySelectorAll('#content > div').forEach(div => {
-                div.style.display = 'none';
-            });
-            
-            // Show the selected content section
-            document.getElementById(`${section}-content`).style.display = 'block';
         }
 
-        // Auto-resize textarea function
-        function autoResizeTextarea(textarea) {
-            textarea.style.height = 'auto'; // Reset height
-            textarea.style.height = (textarea.scrollHeight) + 'px';
-        }
+        // Data Management
+        let processes = JSON.parse(localStorage.getItem('processes')) || [];
+        let processSubheadings = JSON.parse(localStorage.getItem('processSubheadings')) || ['General'];
+        let collapsedSubheadings = JSON.parse(localStorage.getItem('collapsedSubheadings')) || {};
 
-        // Toggle settings menu
-        function toggleSettingsMenu() {
-            const menu = document.getElementById('settingsMenu');
-            menu.classList.toggle('active');
+        // Tab Navigation
+        function openTab(tabName) {
+            document.querySelectorAll('.tab-content').forEach(tab => tab.classList.remove('active'));
+            document.querySelectorAll('.tab-button').forEach(btn => btn.classList.remove('active'));
+            
+            document.getElementById(tabName).classList.add('active');
+            event.currentTarget.classList.add('active');
         }
 
         // Toggle input sections
         function toggleInputs(tab) {
-            const inputSection = document.querySelector(`#${tab}-content .input-section`);
-            const toggleBtn = document.querySelector(`#${tab}-content .new-item-btn`);
+            const inputSection = document.querySelector(`#${tab} .input-section`);
+            const toggleBtn = document.querySelector(`#${tab} .new-item-btn`);
             
             inputSection.classList.toggle('collapsed');
             
             if (inputSection.classList.contains('collapsed')) {
-                toggleBtn.innerHTML = '<i class="fas fa-plus"></i> New Task';
+                toggleBtn.innerHTML = '<i class="fas fa-plus"></i> New Process';
             } else {
                 toggleBtn.innerHTML = 'Hide Form';
             }
         }
 
-        // Reset all data
-        function resetAllData() {
-            if (confirm('Are you sure you want to delete ALL data? This cannot be undone.')) {
-                localStorage.clear();
-                tasks = [];
-                taskSubheadings = ['General'];
-                collapsedSubheadings = {};
-                
-                saveAllData();
-                renderTasks();
-            }
-        }
-
-        function saveAllData() {
-            localStorage.setItem('tasks', JSON.stringify(tasks));
-            localStorage.setItem('taskSubheadings', JSON.stringify(taskSubheadings));
-            localStorage.setItem('collapsedSubheadings', JSON.stringify(collapsedSubheadings));
-        }
-
         // Subheading functions
         function renderSubheadings(type) {
-            const listContainer = document.getElementById('tasksList');
+            const listContainer = document.getElementById('processesList');
+            const subheadings = processSubheadings;
             
-            // Clear the containers
-            listContainer.innerHTML = '<h3 class="current-header">Current Tasks</h3><div id="currentList"></div><h3 class="completed-header">Completed Tasks</h3><div id="doneList"></div>';
+            // Clear the container
+            listContainer.innerHTML = '';
             
-            taskSubheadings.forEach((subheading, index) => {
+            subheadings.forEach((subheading, index) => {
                 // Render items for this subheading in the list container
                 renderItemsForSubheading(type, subheading, listContainer, index);
             });
         }
 
         function renderItemsForSubheading(type, subheading, container, index) {
-            let items = tasks.filter(t => t.subheading === subheading);
+            let items = processes.filter(p => p.subheading === subheading);
             
             if (items.length === 0) return;
             
@@ -900,7 +689,7 @@
                 e.stopPropagation();
                 moveSubheading(type, index, 'down');
             };
-            downBtn.disabled = index === taskSubheadings.length - 1;
+            downBtn.disabled = index === processSubheadings.length - 1;
             
             const removeBtn = document.createElement('button');
             removeBtn.innerHTML = '×';
@@ -910,7 +699,7 @@
                 e.stopPropagation();
                 removeSubheading(type, index);
             };
-            removeBtn.disabled = taskSubheadings.length <= 1;
+            removeBtn.disabled = processSubheadings.length <= 1;
             
             controls.appendChild(upBtn);
             controls.appendChild(downBtn);
@@ -923,56 +712,21 @@
             const contentContainer = document.createElement('div');
             contentContainer.className = `collapsible-content ${isCollapsed ? 'collapsed' : ''}`;
             
-            // For tasks, we need to add to either current or completed list
-            const currentItems = items.filter(t => !t.completed);
-            const completedItems = items.filter(t => t.completed);
+            // Add items
+            items.forEach(item => {
+                const element = createProcessElement(item);
+                contentContainer.appendChild(element);
+            });
             
-            if (currentItems.length > 0) {
-                const currentContainer = document.getElementById('currentList');
-                currentContainer.appendChild(subheadingElement.cloneNode(true));
-                const currentContent = document.createElement('div');
-                currentContent.className = `collapsible-content ${isCollapsed ? 'collapsed' : ''}`;
-                
-                currentItems.forEach(task => {
-                    const taskElement = createTaskElement(task);
-                    currentContent.appendChild(taskElement);
-                });
-                
-                currentContainer.appendChild(currentContent);
-            }
-            
-            if (completedItems.length > 0) {
-                const completedHeader = document.createElement('div');
-                completedHeader.className = 'subheading';
-                completedHeader.textContent = `${subheading} - Completed`;
-                completedHeader.onclick = (e) => {
-                    if (e.target.closest('.subheading-controls')) return;
-                    const key = `${type}-${subheading}-completed`;
-                    collapsedSubheadings[key] = !collapsedSubheadings[key];
-                    localStorage.setItem('collapsedSubheadings', JSON.stringify(collapsedSubheadings));
-                    
-                    const content = completedHeader.nextElementSibling;
-                    content.classList.toggle('collapsed');
-                };
-                
-                document.getElementById('doneList').appendChild(completedHeader);
-                const completedContent = document.createElement('div');
-                completedContent.className = `collapsible-content ${collapsedSubheadings[`${type}-${subheading}-completed`] ? 'collapsed' : ''}`;
-                
-                completedItems.forEach(task => {
-                    const taskElement = createTaskElement(task);
-                    completedContent.appendChild(taskElement);
-                });
-                
-                document.getElementById('doneList').appendChild(completedContent);
-            }
+            container.appendChild(subheadingElement);
+            container.appendChild(contentContainer);
         }
 
         function moveSubheading(type, index, direction) {
             if (direction === 'up' && index > 0) {
-                [taskSubheadings[index], taskSubheadings[index - 1]] = [taskSubheadings[index - 1], taskSubheadings[index]];
-            } else if (direction === 'down' && index < taskSubheadings.length - 1) {
-                [taskSubheadings[index], taskSubheadings[index + 1]] = [taskSubheadings[index + 1], taskSubheadings[index]];
+                [processSubheadings[index], processSubheadings[index - 1]] = [processSubheadings[index - 1], processSubheadings[index]];
+            } else if (direction === 'down' && index < processSubheadings.length - 1) {
+                [processSubheadings[index], processSubheadings[index + 1]] = [processSubheadings[index + 1], processSubheadings[index]];
             }
             
             saveSubheadings(type);
@@ -980,16 +734,16 @@
         }
 
         function updateSubheading(type, index, value) {
-            const oldValue = taskSubheadings[index];
-            taskSubheadings[index] = value;
+            const oldValue = processSubheadings[index];
+            processSubheadings[index] = value;
             
             // Update all items with the old subheading
-            tasks.forEach(task => {
-                if (task.subheading === oldValue) {
-                    task.subheading = value;
+            processes.forEach(process => {
+                if (process.subheading === oldValue) {
+                    process.subheading = value;
                 }
             });
-            saveTasks();
+            saveProcesses();
             
             saveSubheadings(type);
             renderSubheadings(type);
@@ -1001,8 +755,8 @@
             
             if (!newSubheading) return;
             
-            if (!taskSubheadings.includes(newSubheading)) {
-                taskSubheadings.push(newSubheading);
+            if (!processSubheadings.includes(newSubheading)) {
+                processSubheadings.push(newSubheading);
                 document.getElementById(inputId).value = '';
                 saveSubheadings(type);
                 renderSubheadings(type);
@@ -1010,20 +764,20 @@
         }
 
         function removeSubheading(type, index) {
-            if (taskSubheadings.length <= 1) return;
+            if (processSubheadings.length <= 1) return;
             
-            if (!confirm(`Are you sure you want to delete the "${taskSubheadings[index]}" subheading? All items in this subheading will be moved to "${taskSubheadings[0]}"`)) {
+            if (!confirm(`Are you sure you want to delete the "${processSubheadings[index]}" subheading? All items in this subheading will be moved to "${processSubheadings[0]}"`)) {
                 return;
             }
             
             // Move items from this subheading to the first subheading
-            const subheadingToRemove = taskSubheadings[index];
-            tasks.forEach(task => {
-                if (task.subheading === subheadingToRemove) {
-                    task.subheading = taskSubheadings[0];
+            const subheadingToRemove = processSubheadings[index];
+            processes.forEach(process => {
+                if (process.subheading === subheadingToRemove) {
+                    process.subheading = processSubheadings[0];
                 }
             });
-            saveTasks();
+            saveProcesses();
             
             // Remove from collapsed state tracking
             const key = `${type}-${subheadingToRemove}`;
@@ -1031,294 +785,117 @@
                 delete collapsedSubheadings[key];
             }
             
-            taskSubheadings.splice(index, 1);
+            processSubheadings.splice(index, 1);
             saveSubheadings(type);
             renderSubheadings(type);
         }
 
         function saveSubheadings(type) {
-            localStorage.setItem('taskSubheadings', JSON.stringify(taskSubheadings));
+            localStorage.setItem('processSubheadings', JSON.stringify(processSubheadings));
         }
 
-        // Star Rating System
-        function setupStarRating() {
-            const stars = document.querySelectorAll('#priorityStars i');
-            stars.forEach(star => {
-                star.addEventListener('click', () => {
-                    const value = parseInt(star.getAttribute('data-value'));
-                    selectedPriority = value;
-                    
-                    // Update stars display
-                    stars.forEach((s, index) => {
-                        if (index < value) {
-                            s.classList.add('active');
-                        } else {
-                            s.classList.remove('active');
-                        }
-                    });
-                });
-            });
-            
-            // Set up color picker
-            const colorOptions = document.querySelectorAll('#taskColorPicker .color-option');
-            colorOptions.forEach(option => {
-                option.addEventListener('click', () => {
-                    colorOptions.forEach(opt => opt.classList.remove('selected'));
-                    option.classList.add('selected');
-                    selectedColor = option.getAttribute('data-color');
-                });
-            });
-        }
-
-        // Task Functions
-        function addTask() {
-            const priorityText = 
-                selectedPriority >= 4 ? 'high' : 
-                selectedPriority >= 2 ? 'medium' : 'low';
-
-            const task = {
+        // Process Functions
+        function addProcess() {
+            const process = {
                 id: Date.now(),
-                title: document.getElementById('taskTitle').value.trim(),
-                start: document.getElementById('taskStart').value,
-                due: document.getElementById('taskDue').value,
-                priority: priorityText,
-                priorityValue: selectedPriority,
-                notes: document.getElementById('taskNotes').value,
-                currentStep: '',
-                completed: false,
+                title: document.getElementById('processTitle').value.trim(),
+                steps: document.getElementById('processSteps').value,
                 created: new Date().toISOString(),
-                subheading: taskSubheadings[0],
-                color: selectedColor
+                updated: new Date().toISOString(),
+                subheading: processSubheadings[0]
             };
 
-            if (!task.title) return;
+            if (!process.title) return;
 
-            tasks.push(task);
-            saveTasks();
-            renderTasks();
-            clearTaskForm();
+            processes.push(process);
+            saveProcesses();
+            renderProcesses();
+            clearProcessForm();
         }
 
-        function renderTasks() {
-            renderSubheadings('task');
+        function renderProcesses(filteredProcesses = processes) {
+            renderSubheadings('process');
         }
 
-        function createTaskElement(task) {
-            const taskElement = document.createElement('div');
-            taskElement.className = `task-item priority-${task.priority} ${task.completed ? 'completed' : ''}`;
-            taskElement.setAttribute('data-id', task.id);
-            taskElement.style.borderLeftColor = task.color;
+        function createProcessElement(process) {
+            const processElement = document.createElement('div');
+            processElement.className = 'process-item';
+            processElement.setAttribute('data-id', process.id);
             
-            // Calculate timeline progress if dates exist
-            let timelineHTML = '';
-            if (task.start && task.due) {
-                const progress = calculateTimelineProgress(task.start, task.due);
-                
-                // Determine color based on progress
-                let progressColor;
-                if (progress.percentage < 33) {
-                    progressColor = '#28a745'; // Green
-                } else if (progress.percentage < 66) {
-                    progressColor = '#ffc107'; // Yellow
-                } else {
-                    progressColor = '#dc3545'; // Red
-                }
-                
-                timelineHTML = `
-                    <div class="timeline-container">
-                        <div class="timeline-bar">
-                            <div class="timeline-progress" style="width: ${progress.percentage}%; background-color: ${progressColor}"></div>
-                        </div>
-                        <div class="timeline-dates">
-                            <span>${formatDate(task.due)}</span>
-                        </div>
-                    </div>
-                `;
-            }
-
-            // Create star rating for priority
-            let starsHTML = '';
-            for (let i = 1; i <= 5; i++) {
-                starsHTML += `<i class="fas fa-star ${i <= task.priorityValue ? 'active' : ''}" 
-                             onclick="updateTaskPriority(${task.id}, ${i})"></i>`;
-            }
-
             // Subheading selector
-            const subheadingOptions = taskSubheadings.map(sh => 
-                `<option value="${sh}" ${task.subheading === sh ? 'selected' : ''}>${sh}</option>`
+            const subheadingOptions = processSubheadings.map(sh => 
+                `<option value="${sh}" ${process.subheading === sh ? 'selected' : ''}>${sh}</option>`
             ).join('');
 
-            // Color picker for the task
-            const colors = ['#1a73e8', '#dc3545', '#28a745', '#ffc107', '#6f42c1'];
-            const colorOptions = colors.map(color => 
-                `<div class="color-option ${task.color === color ? 'selected' : ''}" 
-                      style="background-color: ${color}" 
-                      data-color="${color}"
-                      onclick="updateTaskColor(${task.id}, '${color}')"></div>`
-            ).join('');
-
-            taskElement.innerHTML = `
-                <div class="task-header">
-                    <span class="task-title" contenteditable="true" 
-                          oninput="updateTaskField(${task.id}, 'title', this.innerText)">
-                        ${task.title}
+            processElement.innerHTML = `
+                <div class="process-header">
+                    <span class="process-title" contenteditable="true" 
+                          oninput="updateProcessField(${process.id}, 'title', this.innerText)">
+                        ${process.title}
                     </span>
-                    <div class="complete-checkbox">
-                        <input type="checkbox" id="complete-${task.id}" ${task.completed ? 'checked' : ''} 
-                               onchange="toggleTask(${task.id})">
-                        <label for="complete-${task.id}" class="complete-checkbox-label">Complete</label>
-                    </div>
-                    <div class="task-controls">
-                        <button class="delete-btn" onclick="confirmDelete('task', ${task.id})">
+                    <div class="process-controls">
+                        <button class="delete-btn" onclick="confirmDelete('process', ${process.id})">
                             <i class="fas fa-trash"></i>
                         </button>
                     </div>
                 </div>
-                <div class="subheading-selector">
-                    <select onchange="updateTaskField(${task.id}, 'subheading', this.value)">
+                <div class="process-subheading-selector">
+                    <select onchange="updateProcessField(${process.id}, 'subheading', this.value)">
                         ${subheadingOptions}
                     </select>
                 </div>
-                <textarea class="current-step" placeholder="Current step..." 
-                       oninput="updateTaskField(${task.id}, 'currentStep', this.value); autoResizeTextarea(this)">${task.currentStep || ''}</textarea>
-                <div class="task-meta">
-                    <div class="task-meta-item">
-                        <span>Priority:</span>
-                        <div class="star-rating">
-                            ${starsHTML}
-                        </div>
-                    </div>
-                    <div class="task-meta-item">
-                        <span>Start:</span>
-                        <input type="date" value="${task.start}" 
-                               onchange="updateTaskField(${task.id}, 'start', this.value)">
-                    </div>
-                    <div class="task-meta-item">
-                        <span>Due:</span>
-                        <input type="date" value="${task.due}" 
-                               onchange="updateTaskField(${task.id}, 'due', this.value)">
-                    </div>
-                    <div class="task-meta-item">
-                        <span>Color:</span>
-                        <div class="color-picker">
-                            ${colorOptions}
-                        </div>
-                    </div>
-                    ${timelineHTML}
-                </div>
                 <div class="notes-header" onclick="toggleNotes(this)">
-                    Notes
+                    Steps
                 </div>
                 <div class="notes-content">
-                    <textarea oninput="updateTaskField(${task.id}, 'notes', this.value)"
-                              style="width:100%; min-height: 120px;">${task.notes}</textarea>
+                    <textarea oninput="updateProcessField(${process.id}, 'steps', this.value)"
+                              style="width:100%; min-height: 120px;">
+                        ${process.steps}
+                    </textarea>
                 </div>
                 <div class="move-buttons">
-                    <button onclick="moveTask(${task.id}, 'up')">↑</button>
-                    <button onclick="moveTask(${task.id}, 'down')">↓</button>
+                    <button onclick="moveProcess(${process.id}, 'up')">↑</button>
+                    <button onclick="moveProcess(${process.id}, 'down')">↓</button>
                 </div>
             `;
-            
-            // Initialize auto-resize for the current step textarea
-            const currentStepTextarea = taskElement.querySelector('.current-step');
-            autoResizeTextarea(currentStepTextarea);
-            
-            return taskElement;
+            return processElement;
         }
 
-        function calculateTimelineProgress(startDate, dueDate) {
-            const now = new Date();
-            const start = new Date(startDate);
-            const end = new Date(dueDate);
-            
-            // Ensure dates are valid
-            if (isNaN(start.getTime()) || isNaN(end.getTime())) {
-                return { percentage: 0, status: 'invalid' };
-            }
-            
-            const total = end - start;
-            const elapsed = now - start;
-            
-            let percentage = (elapsed / total) * 100;
-            
-            // Clamp between 0 and 100
-            percentage = Math.max(0, Math.min(100, percentage));
-            
-            let status = 'on-track';
-            if (now > end) {
-                status = 'overdue';
-            } else if (percentage > 80) {
-                status = 'nearing-deadline';
-            }
-            
-            return { percentage, status };
-        }
-
-        function formatDate(dateString) {
-            if (!dateString) return '';
-            const options = { year: 'numeric', month: 'short', day: 'numeric' };
-            return new Date(dateString).toLocaleDateString(undefined, options);
-        }
-
-        function updateTaskPriority(taskId, newPriority) {
-            const task = tasks.find(t => t.id === taskId);
-            if (task) {
-                task.priorityValue = newPriority;
-                task.priority = newPriority >= 4 ? 'high' : newPriority >= 2 ? 'medium' : 'low';
-                saveTasks();
-                renderTasks();
-            }
-        }
-
-        function updateTaskColor(taskId, color) {
-            const task = tasks.find(t => t.id === taskId);
-            if (task) {
-                task.color = color;
-                saveTasks();
-                renderTasks();
-            }
-        }
-
-        function toggleTask(id) {
-            const task = tasks.find(t => t.id === id);
-            if (task) {
-                task.completed = !task.completed;
-                saveTasks();
-                renderTasks();
-            }
-        }
-
-        function moveTask(id, direction) {
-            const index = tasks.findIndex(t => t.id === id);
+        function moveProcess(id, direction) {
+            const index = processes.findIndex(p => p.id === id);
             if (direction === 'up' && index > 0) {
-                [tasks[index], tasks[index - 1]] = [tasks[index - 1], tasks[index]];
-            } else if (direction === 'down' && index < tasks.length - 1) {
-                [tasks[index], tasks[index + 1]] = [tasks[index + 1], tasks[index]];
+                [processes[index], processes[index - 1]] = [processes[index - 1], processes[index]];
+            } else if (direction === 'down' && index < processes.length - 1) {
+                [processes[index], processes[index + 1]] = [processes[index + 1], processes[index]];
             }
-            saveTasks();
-            renderTasks();
+            saveProcesses();
+            renderProcesses();
         }
 
         // Common Functions
         function confirmDelete(type, id) {
             if (window.confirm(`Are you sure you want to delete this ${type}?`)) {
-                deleteTask(id);
+                deleteProcess(id);
             }
         }
 
-        function deleteTask(id) {
-            tasks = tasks.filter(t => t.id !== id);
-            saveTasks();
-            renderTasks();
+        function deleteProcess(id) {
+            processes = processes.filter(p => p.id !== id);
+            saveProcesses();
+            renderProcesses();
         }
 
-        function updateTaskField(id, field, value) {
-            const task = tasks.find(t => t.id === id);
-            if (task) {
-                task[field] = value;
-                saveTasks();
+        function updateProcessField(id, field, value) {
+            const process = processes.find(p => p.id === id);
+            if (process) {
+                process[field] = value;
+                process.updated = new Date().toISOString();
+                saveProcesses();
                 if (field === 'subheading') {
-                    renderTasks();
+                    renderProcesses();
+                }
+                if (field === 'title') {
+                    // Update any sidebar or other references if needed
                 }
             }
         }
@@ -1328,102 +905,58 @@
             content.classList.toggle('expanded');
         }
 
-        function searchTasks() {
-            const searchTerm = document.getElementById('taskSearch').value.toLowerCase();
-            const filtered = tasks.filter(t => 
-                t.title.toLowerCase().includes(searchTerm) ||
-                (t.notes && t.notes.toLowerCase().includes(searchTerm)) ||
-                (t.currentStep && t.currentStep.toLowerCase().includes(searchTerm))
+        function searchProcesses() {
+            const searchTerm = document.getElementById('processSearch').value.toLowerCase();
+            const filtered = processes.filter(p => 
+                p.title.toLowerCase().includes(searchTerm) ||
+                p.steps.toLowerCase().includes(searchTerm)
             );
             
-            const tasksList = document.getElementById('tasksList');
-            tasksList.innerHTML = '<h3 class="current-header">Current Tasks</h3><div id="currentList"></div><h3 class="completed-header">Completed Tasks</h3><div id="doneList"></div>';
+            const processesList = document.getElementById('processesList');
+            processesList.innerHTML = '';
             
             // Group by subheading
-            const currentGrouped = {};
-            const completedGrouped = {};
-            
-            filtered.forEach(task => {
-                if (!task.completed) {
-                    if (!currentGrouped[task.subheading]) {
-                        currentGrouped[task.subheading] = [];
-                    }
-                    currentGrouped[task.subheading].push(task);
-                } else {
-                    if (!completedGrouped[task.subheading]) {
-                        completedGrouped[task.subheading] = [];
-                    }
-                    completedGrouped[task.subheading].push(task);
+            const grouped = {};
+            filtered.forEach(process => {
+                if (!grouped[process.subheading]) {
+                    grouped[process.subheading] = [];
                 }
+                grouped[process.subheading].push(process);
             });
             
-            // Render current tasks
-            for (const [subheading, items] of Object.entries(currentGrouped)) {
+            // Render each group
+            for (const [subheading, items] of Object.entries(grouped)) {
                 const subheadingElement = document.createElement('div');
                 subheadingElement.className = 'subheading';
                 subheadingElement.textContent = subheading;
-                document.getElementById('currentList').appendChild(subheadingElement);
+                processesList.appendChild(subheadingElement);
                 
-                items.forEach(task => {
-                    const taskElement = createTaskElement(task);
-                    document.getElementById('currentList').appendChild(taskElement);
-                });
-            }
-            
-            // Render completed tasks
-            for (const [subheading, items] of Object.entries(completedGrouped)) {
-                const subheadingElement = document.createElement('div');
-                subheadingElement.className = 'subheading';
-                subheadingElement.textContent = `${subheading} - Completed`;
-                document.getElementById('doneList').appendChild(subheadingElement);
-                
-                items.forEach(task => {
-                    const taskElement = createTaskElement(task);
-                    document.getElementById('doneList').appendChild(taskElement);
+                items.forEach(process => {
+                    const processElement = createProcessElement(process);
+                    processesList.appendChild(processElement);
                 });
             }
         }
 
         // Form Clearing
-        function clearTaskForm() {
-            document.getElementById('taskTitle').value = '';
-            document.getElementById('taskStart').value = '';
-            document.getElementById('taskDue').value = '';
-            document.getElementById('taskNotes').value = '';
-            // Reset star rating
-            selectedPriority = 1;
-            const stars = document.querySelectorAll('#priorityStars i');
-            stars.forEach((star, index) => {
-                if (index === 0) {
-                    star.classList.add('active');
-                } else {
-                    star.classList.remove('active');
-                }
-            });
-            // Reset color picker
-            selectedColor = '#1a73e8';
-            const colorOptions = document.querySelectorAll('#taskColorPicker .color-option');
-            colorOptions.forEach((option, index) => {
-                if (index === 0) {
-                    option.classList.add('selected');
-                } else {
-                    option.classList.remove('selected');
-                }
-            });
+        function clearProcessForm() {
+            document.getElementById('processTitle').value = '';
+            document.getElementById('processSteps').value = '';
         }
 
         // Storage
-        function saveTasks() { localStorage.setItem('tasks', JSON.stringify(tasks)); }
+        function saveProcesses() { localStorage.setItem('processes', JSON.stringify(processes)); }
 
         // Initialization
         window.onload = () => {
-            setupStarRating();
-            renderTasks();
+            renderProcesses();
+            openTab('processes');
             
-            // Collapse all input sections by default
-            document.querySelectorAll('.input-section').forEach(section => {
-                section.classList.add('collapsed');
-            });
+            // Collapse input section by default
+            document.querySelector('.input-section').classList.add('collapsed');
+            
+            // Set Processes menu item as active
+            document.querySelector('.menu-item:nth-child(3)').classList.add('active');
         };
     </script>
 </body>
