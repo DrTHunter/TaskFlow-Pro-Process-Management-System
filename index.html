@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Contacts Application with Sidebar</title>
+    <title>Process Management System</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         * {
@@ -148,54 +148,33 @@
         }
 
         /* Main Content Styles */
-        .container {
+        .main-content {
             flex: 1;
-            background-color: white;
-            height: 100vh;
             display: flex;
             flex-direction: column;
+            height: 100vh;
             overflow: hidden;
+            background-color: white;
         }
 
-        .tabs {
-            display: flex;
-            background-color: #1a73e8;
-            flex-wrap: wrap;
-            position: relative;
-        }
-
-        .tab-button {
-            padding: 12px 20px;
-            background: none;
-            border: none;
-            color: white;
-            cursor: pointer;
-            transition: background-color 0.3s;
-            font-size: 14px;
+        .content-header {
+            padding: 15px 20px;
+            background-color: #f8f9fa;
+            border-bottom: 1px solid #e0e0e0;
             display: flex;
             align-items: center;
-            gap: 5px;
+            justify-content: space-between;
         }
 
-        .tab-button.active {
-            background-color: #1557b0;
-        }
-
-        .settings-button {
-            position: absolute;
-            right: 10px;
-            top: 50%;
-            transform: translateY(-50%);
-            background: none;
-            border: none;
-            color: white;
-            cursor: pointer;
-            font-size: 16px;
+        .content-title {
+            font-size: 18px;
+            font-weight: 600;
+            color: #333;
         }
 
         .tab-content {
             display: none;
-            padding: 15px;
+            padding: 20px;
             overflow-y: auto;
             flex: 1;
         }
@@ -206,12 +185,11 @@
 
         .input-section {
             display: flex;
-            flex-wrap: wrap;
+            flex-direction: column;
             gap: 10px;
             margin-bottom: 15px;
             transition: all 0.3s ease;
             overflow: hidden;
-            align-items: flex-end;
             border-bottom: 1px solid #ddd;
             padding-bottom: 15px;
         }
@@ -225,10 +203,17 @@
             padding-bottom: 0;
         }
 
+        .input-row {
+            display: flex;
+            gap: 10px;
+            align-items: flex-end;
+        }
+
         .input-group {
             display: flex;
             flex-direction: column;
             min-width: 150px;
+            flex-grow: 1;
         }
 
         .input-group label {
@@ -261,8 +246,8 @@
             filter: brightness(0.9);
         }
 
-        .contact-item {
-            padding: 8px 12px;
+        .process-item {
+            padding: 12px;
             background-color: white;
             margin-bottom: 8px;
             border-radius: 4px;
@@ -270,13 +255,20 @@
             position: relative;
         }
 
-        .contact-controls {
-            position: absolute;
-            top: 8px;
-            right: 12px;
+        .process-header {
             display: flex;
-            gap: 8px;
             align-items: center;
+            gap: 10px;
+        }
+
+        .process-title {
+            width: 50%;
+            max-width: 50%;
+            word-wrap: break-word;
+            min-height: 20px;
+            padding: 5px;
+            border: none;
+            border-radius: 4px;
         }
 
         .delete-btn {
@@ -284,9 +276,9 @@
             padding: 6px 12px;
         }
 
-        .contact-move-buttons {
+        .move-buttons {
             position: absolute;
-            top: 40px;
+            top: 50px;
             right: 12px;
             display: flex;
             gap: 5px;
@@ -305,25 +297,51 @@
             margin-left: 10px;
         }
 
-        .filter-btn {
-            padding: 8px 12px;
-            font-size: 12px;
-            background-color: #6c757d;
+        .notes-header {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin: 10px 0;
+            cursor: pointer;
+            color: #1a73e8;
+            font-size: 0.9em;
         }
 
-        .notes-container {
-            width: 100%;
-            margin-top: 15px;
+        .notes-content {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.3s ease-out;
         }
-        
-        .large-notes {
+
+        .notes-content.expanded {
+            max-height: 1000px;
+        }
+
+        .process-content {
             width: 100%;
-            min-height: 150px;
-            padding: 10px;
+            min-height: 120px;
+            padding: 8px;
             border: 1px solid #ddd;
             border-radius: 4px;
             resize: vertical;
-            font-size: 14px;
+            font-size: 13px;
+        }
+
+        .process-controls {
+            position: absolute;
+            top: 12px;
+            right: 12px;
+            display: flex;
+            gap: 8px;
+            align-items: center;
+        }
+
+        .new-item-btn {
+            min-width: 120px;
+            margin-right: 10px;
+            padding: 8px 15px;
+            font-size: 13px;
+            background-color: #28a745;
         }
 
         .subheading {
@@ -359,58 +377,10 @@
             margin-left: 10px;
         }
 
-        .contact-subheading-selector {
+        .process-subheading-selector {
             position: absolute;
             right: 50px;
-            top: 8px;
-        }
-
-        .contact-details {
-            margin: 5px 0;
-            display: flex;
-            flex-direction: column;
-            gap: 5px;
-        }
-
-        .contact-details div {
-            margin: 2px 0;
-            padding: 2px;
-            display: flex;
-            align-items: flex-start;
-        }
-
-        .contact-details span {
-            display: inline-block;
-            min-width: 60px;
-            color: #555;
-            font-size: 13px;
-        }
-
-        .contact-details .editable {
-            border: none;
-            padding: 2px 5px;
-            border-radius: 3px;
-            font-size: 13px;
-            min-width: 150px;
-            margin-left: 5px;
-        }
-
-        .contact-details .editable:focus {
-            outline: none;
-            background-color: #f0f0f0;
-        }
-
-        .new-item-btn {
-            min-width: 120px;
-            margin-right: 10px;
-            padding: 8px 15px;
-            font-size: 13px;
-            background-color: #28a745;
-        }
-
-        .reset-btn {
-            background-color: #dc3545;
-            margin-top: 15px;
+            top: 12px;
         }
 
         .new-subheading-bar {
@@ -447,94 +417,14 @@
             max-height: 0;
         }
 
-        .contact-header {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            margin-left: 25px;
-        }
-
-        .contact-flag {
-            color: #ddd;
-            cursor: pointer;
-            position: absolute;
-            left: 15px;
-            top: 15px;
-            font-size: 16px;
-        }
-
-        .contact-flag.active {
-            color: #ffc107;
-        }
-
-        .waiting-on-input {
-            height: 36px;
-            width: 300px !important;
-            margin-left: 0 !important;
-            margin-right: 10px;
-            padding: 5px;
-            font-size: 13px;
-            border: 1px solid #ddd;
-            border-radius: 4px;
-            resize: none;
-            min-height: 36px;
-            max-height: none;
-            overflow-y: auto;
-        }
-
-        .notes-header {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            margin: 10px 0;
-            cursor: pointer;
-            color: #1a73e8;
-            font-size: 0.9em;
-        }
-
-        .notes-content {
-            max-height: 0;
-            overflow: hidden;
-            transition: max-height 0.3s ease-out;
-        }
-
-        .notes-content.expanded {
-            max-height: 1000px;
-        }
-
-        .settings-menu {
-            display: none;
-            position: absolute;
-            right: 10px;
-            top: 50px;
-            background-color: white;
-            border: 1px solid #ddd;
-            border-radius: 4px;
+        .large-notes {
+            width: 100%;
+            min-height: 150px;
             padding: 10px;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
-            z-index: 100;
-        }
-
-        .settings-menu.active {
-            display: block;
-        }
-
-        /* Contact Name and Waiting On adjustments */
-        .contact-name-input {
-            width: 60% !important;
-        }
-
-        /* Subheading controls spacing */
-        .subheading-controls {
-            gap: 8px !important;
-            margin-left: 15px !important;
-        }
-
-        /* Add button sizing */
-        .new-subheading-bar button {
-            height: 30px !important;
-            padding: 0 10px !important;
-            line-height: 30px !important;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            resize: vertical;
+            font-size: 14px;
         }
 
         @media (max-width: 768px) {
@@ -546,34 +436,33 @@
             .sidebar {
                 width: 100%;
                 height: auto;
-                padding: 10px 0;
                 flex-direction: row;
+                padding: 10px;
                 align-items: center;
-                justify-content: space-around;
             }
             
             .sidebar:hover {
                 width: 100%;
-                padding-left: 0;
+                height: auto;
             }
             
             .logo-container {
                 margin-bottom: 0;
-                width: auto;
+                margin-right: 20px;
             }
             
             .nav-menu {
                 flex-direction: row;
-                width: auto;
+                overflow-x: auto;
             }
             
             .menu-item {
                 margin-bottom: 0;
                 margin-right: 5px;
-                padding: 8px 10px;
+                padding: 10px;
             }
             
-            .menu-text, .logo-text {
+            .menu-text {
                 display: none !important;
             }
             
@@ -581,73 +470,60 @@
                 display: none;
             }
             
-            .container {
+            .main-content {
                 height: auto;
             }
             
-            .tab-button {
-                flex: 1;
-                padding: 10px;
-                font-size: 12px;
-            }
-            
-            .input-section {
+            .input-row {
                 flex-direction: column;
             }
             
             button {
                 padding: 6px 12px;
+                width: 100%;
             }
 
-            .contact-subheading-selector {
+            .process-subheading-selector {
                 position: static;
                 margin-top: 5px;
                 width: 100%;
             }
 
-            .contact-name-input,
-            .waiting-on-input {
+            .process-title {
                 width: 100% !important;
             }
         }
     </style>
 </head>
 <body>
-    <!-- Sidebar -->
     <div class="sidebar">
         <div class="logo-container">
             <div class="logo">S</div>
-            <div class="logo-text">Sidebar</div>
+            <div class="logo-text">Process Manager</div>
         </div>
         
         <div class="nav-menu">
-            <div class="menu-item active" onclick="setActive(this)">
+            <div class="menu-item" onclick="setActive(this); showTab('dashboard')">
                 <div class="menu-icon"><i class="fas fa-home"></i></div>
                 <div class="menu-text">Dashboard</div>
                 <div class="menu-chevron"><i class="fas fa-chevron-down"></i></div>
             </div>
             
-            <div class="menu-item" onclick="setActive(this)">
-                <div class="menu-icon"><i class="fas fa-address-book"></i></div>
-                <div class="menu-text">Contacts</div>
-                <div class="menu-chevron"><i class="fas fa-chevron-down"></i></div>
-            </div>
-            
-            <div class="menu-item" onclick="setActive(this)">
+            <div class="menu-item" onclick="setActive(this); showTab('calendar')">
                 <div class="menu-icon"><i class="fas fa-calendar-alt"></i></div>
                 <div class="menu-text">Calendar</div>
                 <div class="menu-chevron"><i class="fas fa-chevron-down"></i></div>
             </div>
             
-            <div class="menu-item" onclick="setActive(this)">
-                <div class="menu-icon"><i class="fas fa-tasks"></i></div>
-                <div class="menu-text">Projects</div>
+            <div class="menu-item active" onclick="setActive(this); showTab('processes')">
+                <div class="menu-icon"><i class="fas fa-project-diagram"></i></div>
+                <div class="menu-text">Processes</div>
                 <div class="menu-chevron"><i class="fas fa-chevron-down"></i></div>
             </div>
             
             <div class="divider"></div>
             
-            <div class="menu-item" onclick="setActive(this)">
+            <div class="menu-item" onclick="setActive(this); showTab('settings')">
                 <div class="menu-icon"><i class="fas fa-cog"></i></div>
                 <div class="menu-text">Settings</div>
                 <div class="menu-chevron"><i class="fas fa-chevron-down"></i></div>
@@ -655,63 +531,58 @@
         </div>
     </div>
 
-    <!-- Main Content -->
-    <div class="container">
-        <div class="tabs">
-            <button class="tab-button active">
-                <i class="fas fa-address-book"></i> Contacts
-            </button>
-            <button class="settings-button" onclick="toggleSettingsMenu()">
-                <i class="fas fa-cog"></i>
-            </button>
-            <div class="settings-menu" id="settingsMenu">
-                <button class="reset-btn" onclick="resetAllData()">
-                    Reset All Data
-                </button>
+    <div class="main-content">
+        <div class="content-header">
+            <div class="content-title" id="contentTitle">Processes</div>
+            <div class="search-container" id="searchContainer">
+                <input type="text" class="search-bar" id="processSearch" placeholder="Search processes..." oninput="searchProcesses()">
             </div>
         </div>
 
-        <!-- Contacts Tab -->
-        <div id="contacts" class="tab-content active">
+        <!-- Dashboard Tab -->
+        <div id="dashboard" class="tab-content">
+            <h2>Dashboard Content</h2>
+            <p>This would contain your dashboard information and metrics.</p>
+        </div>
+
+        <!-- Calendar Tab -->
+        <div id="calendar" class="tab-content">
+            <h2>Calendar Content</h2>
+            <p>This would contain your calendar view and scheduling tools.</p>
+        </div>
+
+        <!-- Processes Tab -->
+        <div id="processes" class="tab-content active">
             <div style="display: flex; align-items: center; margin-bottom: 15px;">
-                <button class="new-item-btn" onclick="toggleInputs('contacts')">
-                    <i class="fas fa-plus"></i> New Contact
+                <button class="new-item-btn" onclick="toggleInputs('processes')">
+                    <i class="fas fa-plus"></i> New Process
                 </button>
-                <div class="search-container">
-                    <input type="text" class="search-bar" id="contactSearch" placeholder="Search contacts..." oninput="searchContacts()">
-                    <button class="filter-btn" onclick="toggleFlaggedContacts()">
-                        <i class="fas fa-flag"></i> Flagged Only
-                    </button>
-                </div>
             </div>
             
             <div class="input-section collapsed">
-                <div class="input-group" style="flex: 1.5;">
-                    <input type="text" id="contactName" placeholder="Name" class="contact-name-input">
+                <div class="input-row">
+                    <div class="input-group">
+                        <input type="text" id="processTitle" placeholder="Process title">
+                    </div>
+                    <button onclick="addProcess()">Add Process</button>
                 </div>
                 <div class="input-group">
-                    <input type="text" id="contactJobTitle" placeholder="Job Title">
-                </div>
-                <div class="input-group">
-                    <input type="email" id="contactEmail" placeholder="Email">
-                </div>
-                <div class="input-group">
-                    <input type="tel" id="contactPhone" placeholder="Phone">
-                </div>
-                <input type="text" class="waiting-on-input" placeholder="Waiting on..." id="contactWaitingOn">
-                <button onclick="addContact()">Add Contact</button>
-                
-                <div class="notes-container" style="width: 100%; margin-top: 10px;">
-                    <textarea id="contactNotes" class="large-notes" placeholder="Notes..."></textarea>
+                    <textarea id="processSteps" class="large-notes" placeholder="Step-by-step instructions..."></textarea>
                 </div>
             </div>
             
             <div class="new-subheading-bar">
-                <input type="text" id="newContactSubheading" class="new-subheading-input" placeholder="New subheading name">
-                <button onclick="addSubheading('contact')">Add</button>
+                <input type="text" id="newProcessSubheading" class="new-subheading-input" placeholder="New subheading name">
+                <button onclick="addSubheading('process')">Add</button>
             </div>
             
-            <div id="contactsList"></div>
+            <div id="processesList"></div>
+        </div>
+
+        <!-- Settings Tab -->
+        <div id="settings" class="tab-content">
+            <h2>Settings</h2>
+            <p>This would contain your application settings and configuration options.</p>
         </div>
     </div>
 
@@ -727,23 +598,34 @@
             clickedItem.classList.add('active');
         }
 
+        function showTab(tabName) {
+            // Hide all tab contents
+            document.querySelectorAll('.tab-content').forEach(tab => {
+                tab.classList.remove('active');
+            });
+            
+            // Show the selected tab
+            document.getElementById(tabName).classList.add('active');
+            
+            // Update the content title
+            const titleMap = {
+                'dashboard': 'Dashboard',
+                'calendar': 'Calendar',
+                'processes': 'Processes',
+                'settings': 'Settings'
+            };
+            
+            document.getElementById('contentTitle').textContent = titleMap[tabName];
+            
+            // Show/hide search bar based on tab
+            document.getElementById('searchContainer').style.display = 
+                tabName === 'processes' ? 'inline-flex' : 'none';
+        }
+
         // Data Management
-        let contacts = JSON.parse(localStorage.getItem('contacts')) || [];
-        let contactSubheadings = JSON.parse(localStorage.getItem('contactSubheadings')) || ['General'];
+        let processes = JSON.parse(localStorage.getItem('processes')) || [];
+        let processSubheadings = JSON.parse(localStorage.getItem('processSubheadings')) || ['General'];
         let collapsedSubheadings = JSON.parse(localStorage.getItem('collapsedSubheadings')) || {};
-        let showFlaggedOnly = false;
-
-        // Auto-resize textarea function
-        function autoResizeTextarea(textarea) {
-            textarea.style.height = 'auto'; // Reset height
-            textarea.style.height = (textarea.scrollHeight) + 'px';
-        }
-
-        // Toggle settings menu
-        function toggleSettingsMenu() {
-            const menu = document.getElementById('settingsMenu');
-            menu.classList.toggle('active');
-        }
 
         // Toggle input sections
         function toggleInputs(tab) {
@@ -753,52 +635,28 @@
             inputSection.classList.toggle('collapsed');
             
             if (inputSection.classList.contains('collapsed')) {
-                toggleBtn.innerHTML = '<i class="fas fa-plus"></i> New Contact';
+                toggleBtn.innerHTML = '<i class="fas fa-plus"></i> New Process';
             } else {
                 toggleBtn.innerHTML = 'Hide Form';
             }
         }
 
-        // Toggle flagged contacts filter
-        function toggleFlaggedContacts() {
-            showFlaggedOnly = !showFlaggedOnly;
-            renderContacts();
-        }
-
-        // Reset all data
-        function resetAllData() {
-            if (confirm('Are you sure you want to delete ALL data? This cannot be undone.')) {
-                localStorage.clear();
-                contacts = [];
-                contactSubheadings = ['General'];
-                collapsedSubheadings = {};
-                
-                saveAllData();
-                renderContacts();
-            }
-        }
-
-        function saveAllData() {
-            localStorage.setItem('contacts', JSON.stringify(contacts));
-            localStorage.setItem('contactSubheadings', JSON.stringify(contactSubheadings));
-            localStorage.setItem('collapsedSubheadings', JSON.stringify(collapsedSubheadings));
-        }
-
         // Subheading functions
         function renderSubheadings(type) {
-            const listContainer = document.getElementById('contactsList');
+            const listContainer = document.getElementById('processesList');
+            const subheadings = processSubheadings;
+            
+            // Clear the container
             listContainer.innerHTML = '';
             
-            contactSubheadings.forEach((subheading, index) => {
+            subheadings.forEach((subheading, index) => {
                 // Render items for this subheading in the list container
                 renderItemsForSubheading(type, subheading, listContainer, index);
             });
         }
 
         function renderItemsForSubheading(type, subheading, container, index) {
-            let items = showFlaggedOnly ? 
-                contacts.filter(c => c.subheading === subheading && c.flagged) :
-                contacts.filter(c => c.subheading === subheading);
+            let items = processes.filter(p => p.subheading === subheading);
             
             if (items.length === 0) return;
             
@@ -845,7 +703,7 @@
                 e.stopPropagation();
                 moveSubheading(type, index, 'down');
             };
-            downBtn.disabled = index === contactSubheadings.length - 1;
+            downBtn.disabled = index === processSubheadings.length - 1;
             
             const removeBtn = document.createElement('button');
             removeBtn.innerHTML = '×';
@@ -855,7 +713,7 @@
                 e.stopPropagation();
                 removeSubheading(type, index);
             };
-            removeBtn.disabled = contactSubheadings.length <= 1;
+            removeBtn.disabled = processSubheadings.length <= 1;
             
             controls.appendChild(upBtn);
             controls.appendChild(downBtn);
@@ -868,21 +726,21 @@
             const contentContainer = document.createElement('div');
             contentContainer.className = `collapsible-content ${isCollapsed ? 'collapsed' : ''}`;
             
-            container.appendChild(subheadingElement);
-            container.appendChild(contentContainer);
-            
             // Add items
             items.forEach(item => {
-                const element = createContactElement(item);
+                const element = createProcessElement(item);
                 contentContainer.appendChild(element);
             });
+            
+            container.appendChild(subheadingElement);
+            container.appendChild(contentContainer);
         }
 
         function moveSubheading(type, index, direction) {
             if (direction === 'up' && index > 0) {
-                [contactSubheadings[index], contactSubheadings[index - 1]] = [contactSubheadings[index - 1], contactSubheadings[index]];
-            } else if (direction === 'down' && index < contactSubheadings.length - 1) {
-                [contactSubheadings[index], contactSubheadings[index + 1]] = [contactSubheadings[index + 1], contactSubheadings[index]];
+                [processSubheadings[index], processSubheadings[index - 1]] = [processSubheadings[index - 1], processSubheadings[index]];
+            } else if (direction === 'down' && index < processSubheadings.length - 1) {
+                [processSubheadings[index], processSubheadings[index + 1]] = [processSubheadings[index + 1], processSubheadings[index]];
             }
             
             saveSubheadings(type);
@@ -890,16 +748,16 @@
         }
 
         function updateSubheading(type, index, value) {
-            const oldValue = contactSubheadings[index];
-            contactSubheadings[index] = value;
+            const oldValue = processSubheadings[index];
+            processSubheadings[index] = value;
             
             // Update all items with the old subheading
-            contacts.forEach(contact => {
-                if (contact.subheading === oldValue) {
-                    contact.subheading = value;
+            processes.forEach(process => {
+                if (process.subheading === oldValue) {
+                    process.subheading = value;
                 }
             });
-            saveContacts();
+            saveProcesses();
             
             saveSubheadings(type);
             renderSubheadings(type);
@@ -911,8 +769,8 @@
             
             if (!newSubheading) return;
             
-            if (!contactSubheadings.includes(newSubheading)) {
-                contactSubheadings.push(newSubheading);
+            if (!processSubheadings.includes(newSubheading)) {
+                processSubheadings.push(newSubheading);
                 document.getElementById(inputId).value = '';
                 saveSubheadings(type);
                 renderSubheadings(type);
@@ -920,20 +778,20 @@
         }
 
         function removeSubheading(type, index) {
-            if (contactSubheadings.length <= 1) return;
+            if (processSubheadings.length <= 1) return;
             
-            if (!confirm(`Are you sure you want to delete the "${contactSubheadings[index]}" subheading? All items in this subheading will be moved to "${contactSubheadings[0]}"`)) {
+            if (!confirm(`Are you sure you want to delete the "${processSubheadings[index]}" subheading? All items in this subheading will be moved to "${processSubheadings[0]}"`)) {
                 return;
             }
             
             // Move items from this subheading to the first subheading
-            const subheadingToRemove = contactSubheadings[index];
-            contacts.forEach(contact => {
-                if (contact.subheading === subheadingToRemove) {
-                    contact.subheading = contactSubheadings[0];
+            const subheadingToRemove = processSubheadings[index];
+            processes.forEach(process => {
+                if (process.subheading === subheadingToRemove) {
+                    process.subheading = processSubheadings[0];
                 }
             });
-            saveContacts();
+            saveProcesses();
             
             // Remove from collapsed state tracking
             const key = `${type}-${subheadingToRemove}`;
@@ -941,152 +799,117 @@
                 delete collapsedSubheadings[key];
             }
             
-            contactSubheadings.splice(index, 1);
+            processSubheadings.splice(index, 1);
             saveSubheadings(type);
             renderSubheadings(type);
         }
 
         function saveSubheadings(type) {
-            localStorage.setItem('contactSubheadings', JSON.stringify(contactSubheadings));
+            localStorage.setItem('processSubheadings', JSON.stringify(processSubheadings));
         }
 
-        // Contact Functions
-        function addContact() {
-            const contact = {
+        // Process Functions
+        function addProcess() {
+            const process = {
                 id: Date.now(),
-                name: document.getElementById('contactName').value.trim(),
-                jobTitle: document.getElementById('contactJobTitle').value.trim(),
-                email: document.getElementById('contactEmail').value.trim(),
-                phone: document.getElementById('contactPhone').value.trim(),
-                notes: document.getElementById('contactNotes').value.trim(),
-                flagged: false,
-                waitingOn: document.getElementById('contactWaitingOn').value.trim(),
-                subheading: contactSubheadings[0]
+                title: document.getElementById('processTitle').value.trim(),
+                steps: document.getElementById('processSteps').value,
+                created: new Date().toISOString(),
+                updated: new Date().toISOString(),
+                subheading: processSubheadings[0]
             };
 
-            if (!contact.name) return;
+            if (!process.title) return;
 
-            contacts.push(contact);
-            saveContacts();
-            renderContacts();
-            clearContactForm();
+            processes.push(process);
+            saveProcesses();
+            renderProcesses();
+            clearProcessForm();
         }
 
-        function renderContacts(filteredContacts = contacts) {
-            renderSubheadings('contact');
+        function renderProcesses(filteredProcesses = processes) {
+            renderSubheadings('process');
         }
 
-        function createContactElement(contact) {
-            const contactElement = document.createElement('div');
-            contactElement.className = 'contact-item';
-            contactElement.setAttribute('data-id', contact.id);
+        function createProcessElement(process) {
+            const processElement = document.createElement('div');
+            processElement.className = 'process-item';
+            processElement.setAttribute('data-id', process.id);
             
             // Subheading selector
-            const subheadingOptions = contactSubheadings.map(sh => 
-                `<option value="${sh}" ${contact.subheading === sh ? 'selected' : ''}>${sh}</option>`
+            const subheadingOptions = processSubheadings.map(sh => 
+                `<option value="${sh}" ${process.subheading === sh ? 'selected' : ''}>${sh}</option>`
             ).join('');
 
-            contactElement.innerHTML = `
-                <i class="fas fa-flag contact-flag ${contact.flagged ? 'active' : ''}" 
-                   onclick="toggleContactFlag(${contact.id})"></i>
-                <div class="contact-header">
-                    <span class="task-title" contenteditable="true" 
-                          oninput="updateContactField(${contact.id}, 'name', this.innerText)">
-                        ${contact.name}
+            processElement.innerHTML = `
+                <div class="process-header">
+                    <span class="process-title" contenteditable="true" 
+                          oninput="updateProcessField(${process.id}, 'title', this.innerText)">
+                        ${process.title}
                     </span>
-                    <textarea class="waiting-on-input" placeholder="Waiting on..." 
-                           oninput="updateContactField(${contact.id}, 'waitingOn', this.value)">${contact.waitingOn || ''}</textarea>
-                    <div class="contact-controls">
-                        <button class="delete-btn" onclick="confirmDelete('contact', ${contact.id})">
+                    <div class="process-controls">
+                        <button class="delete-btn" onclick="confirmDelete('process', ${process.id})">
                             <i class="fas fa-trash"></i>
                         </button>
                     </div>
                 </div>
-                <div class="contact-subheading-selector">
-                    <select onchange="updateContactField(${contact.id}, 'subheading', this.value)">
+                <div class="process-subheading-selector">
+                    <select onchange="updateProcessField(${process.id}, 'subheading', this.value)">
                         ${subheadingOptions}
                     </select>
                 </div>
-                <div class="contact-details">
-                    <div>
-                        <span>Title:</span>
-                        <span class="editable" contenteditable="true" 
-                              oninput="updateContactField(${contact.id}, 'jobTitle', this.innerText)">
-                            ${contact.jobTitle || 'Not specified'}
-                        </span>
-                    </div>
-                    <div>
-                        <span>Email:</span>
-                        <span class="editable" contenteditable="true" 
-                              oninput="updateContactField(${contact.id}, 'email', this.innerText)">
-                            ${contact.email || 'Not specified'}
-                        </span>
-                    </div>
-                    <div>
-                        <span>Phone:</span>
-                        <span class="editable" contenteditable="true" 
-                              oninput="updateContactField(${contact.id}, 'phone', this.innerText)">
-                            ${contact.phone || 'Not specified'}
-                        </span>
-                    </div>
-                </div>
                 <div class="notes-header" onclick="toggleNotes(this)">
-                    Notes
+                    Steps
                 </div>
                 <div class="notes-content">
-                    <textarea oninput="updateContactField(${contact.id}, 'notes', this.value)"
+                    <textarea oninput="updateProcessField(${process.id}, 'steps', this.value)"
                               style="width:100%; min-height: 120px;">
-                        ${contact.notes}
+                        ${process.steps}
                     </textarea>
                 </div>
-                <div class="contact-move-buttons">
-                    <button onclick="moveContact(${contact.id}, 'up')">↑</button>
-                    <button onclick="moveContact(${contact.id}, 'down')">↓</button>
+                <div class="move-buttons">
+                    <button onclick="moveProcess(${process.id}, 'up')">↑</button>
+                    <button onclick="moveProcess(${process.id}, 'down')">↓</button>
                 </div>
             `;
-            return contactElement;
+            return processElement;
         }
 
-        function toggleContactFlag(id) {
-            const contact = contacts.find(c => c.id === id);
-            if (contact) {
-                contact.flagged = !contact.flagged;
-                saveContacts();
-                renderContacts();
-            }
-        }
-
-        function moveContact(id, direction) {
-            const index = contacts.findIndex(c => c.id === id);
+        function moveProcess(id, direction) {
+            const index = processes.findIndex(p => p.id === id);
             if (direction === 'up' && index > 0) {
-                [contacts[index], contacts[index - 1]] = [contacts[index - 1], contacts[index]];
-            } else if (direction === 'down' && index < contacts.length - 1) {
-                [contacts[index], contacts[index + 1]] = [contacts[index + 1], contacts[index]];
+                [processes[index], processes[index - 1]] = [processes[index - 1], processes[index]];
+            } else if (direction === 'down' && index < processes.length - 1) {
+                [processes[index], processes[index + 1]] = [processes[index + 1], processes[index]];
             }
-            saveContacts();
-            renderContacts();
+            saveProcesses();
+            renderProcesses();
         }
 
         // Common Functions
         function confirmDelete(type, id) {
             if (window.confirm(`Are you sure you want to delete this ${type}?`)) {
-                deleteContact(id);
+                deleteProcess(id);
             }
         }
 
-        function deleteContact(id) {
-            contacts = contacts.filter(c => c.id !== id);
-            saveContacts();
-            renderContacts();
+        function deleteProcess(id) {
+            processes = processes.filter(p => p.id !== id);
+            saveProcesses();
+            renderProcesses();
         }
 
-        function updateContactField(id, field, value) {
-            const contact = contacts.find(c => c.id === id);
-            if (contact) {
-                contact[field] = value;
-                saveContacts();
+        function updateProcessField(id, field, value) {
+            const process = processes.find(p => p.id === id);
+            if (process) {
+                process[field] = value;
+                process.updated = new Date().toISOString();
+                saveProcesses();
                 if (field === 'subheading') {
-                    renderContacts();
+                    renderProcesses();
+                }
+                if (field === 'title') {
+                    // Update any sidebar or other references if needed
                 }
             }
         }
@@ -1096,22 +919,23 @@
             content.classList.toggle('expanded');
         }
 
-        function searchContacts() {
-            const searchTerm = document.getElementById('contactSearch').value.toLowerCase();
-            const filtered = showFlaggedOnly ? 
-                contacts.filter(c => c.flagged && Object.values(c).some(val => String(val).toLowerCase().includes(searchTerm))) :
-                contacts.filter(c => Object.values(c).some(val => String(val).toLowerCase().includes(searchTerm)));
+        function searchProcesses() {
+            const searchTerm = document.getElementById('processSearch').value.toLowerCase();
+            const filtered = processes.filter(p => 
+                p.title.toLowerCase().includes(searchTerm) ||
+                p.steps.toLowerCase().includes(searchTerm)
+            );
             
-            const contactsList = document.getElementById('contactsList');
-            contactsList.innerHTML = '';
+            const processesList = document.getElementById('processesList');
+            processesList.innerHTML = '';
             
             // Group by subheading
             const grouped = {};
-            filtered.forEach(contact => {
-                if (!grouped[contact.subheading]) {
-                    grouped[contact.subheading] = [];
+            filtered.forEach(process => {
+                if (!grouped[process.subheading]) {
+                    grouped[process.subheading] = [];
                 }
-                grouped[contact.subheading].push(contact);
+                grouped[process.subheading].push(process);
             });
             
             // Render each group
@@ -1119,36 +943,36 @@
                 const subheadingElement = document.createElement('div');
                 subheadingElement.className = 'subheading';
                 subheadingElement.textContent = subheading;
-                contactsList.appendChild(subheadingElement);
+                processesList.appendChild(subheadingElement);
                 
-                items.forEach(contact => {
-                    const contactElement = createContactElement(contact);
-                    contactsList.appendChild(contactElement);
+                items.forEach(process => {
+                    const processElement = createProcessElement(process);
+                    processesList.appendChild(processElement);
                 });
             }
         }
 
         // Form Clearing
-        function clearContactForm() {
-            document.getElementById('contactName').value = '';
-            document.getElementById('contactJobTitle').value = '';
-            document.getElementById('contactEmail').value = '';
-            document.getElementById('contactPhone').value = '';
-            document.getElementById('contactNotes').value = '';
-            document.getElementById('contactWaitingOn').value = '';
+        function clearProcessForm() {
+            document.getElementById('processTitle').value = '';
+            document.getElementById('processSteps').value = '';
         }
 
         // Storage
-        function saveContacts() { localStorage.setItem('contacts', JSON.stringify(contacts)); }
+        function saveProcesses() { localStorage.setItem('processes', JSON.stringify(processes)); }
 
         // Initialization
         window.onload = () => {
-            renderContacts();
+            renderProcesses();
             
-            // Collapse all input sections by default
-            document.querySelectorAll('.input-section').forEach(section => {
-                section.classList.add('collapsed');
-            });
+            // Collapse input section by default
+            document.querySelector('.input-section').classList.add('collapsed');
+            
+            // Set Processes menu item as active by default
+            document.querySelector('.menu-item:nth-child(3)').classList.add('active');
+            
+            // Only show search bar for processes tab
+            document.getElementById('searchContainer').style.display = 'inline-flex';
         };
     </script>
 </body>
