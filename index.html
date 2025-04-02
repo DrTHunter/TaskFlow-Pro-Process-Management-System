@@ -181,9 +181,8 @@
 
         .wide-input-section {
             display: flex;
-            flex-wrap: nowrap;
+            flex-wrap: wrap;
             align-items: flex-end;
-            gap: 15px;
         }
 
         .wide-input-section .input-group:first-child {
@@ -191,35 +190,26 @@
             min-width: 300px;
         }
 
-        .wide-input-section .input-group {
+        .wide-input-section .input-group:not(:first-child) {
             flex: 1;
-            min-width: 120px;
-        }
-
-        .wide-input-section .input-group.priority-group {
             min-width: 150px;
         }
 
-        .wide-input-section .input-group.color-group {
-            min-width: 120px;
-        }
-
         .wide-input-section button {
-            margin-left: 0;
+            margin-left: auto;
             height: 36px;
-            min-width: 100px;
         }
 
         .input-group {
             display: flex;
             flex-direction: column;
+            min-width: 150px;
         }
 
         .input-group label {
             font-size: 12px;
             margin-bottom: 4px;
             color: #555;
-            white-space: nowrap;
         }
 
         input, select, textarea {
@@ -277,13 +267,13 @@
             display: flex;
             align-items: center;
             margin-bottom: 10px;
-            gap: 10px;
+            gap: 20px;
             flex-wrap: wrap;
         }
 
         .task-title {
             font-weight: bold;
-            flex-grow: 1;
+            flex: 2;
             min-width: 200px;
             word-wrap: break-word;
             min-height: 20px;
@@ -298,10 +288,11 @@
             align-items: center;
             gap: 5px;
             white-space: nowrap;
-            margin-left: 10px;
+            margin-left: 0;
             flex-shrink: 1;
             min-width: 0;
             overflow: hidden;
+            flex: 1;
         }
 
         .current-step {
@@ -321,18 +312,21 @@
 
         .task-meta {
             display: flex;
-            gap: 10px;
+            gap: 15px;
             margin-top: 8px;
             font-size: 0.85em;
             color: #666;
             flex-wrap: wrap;
             align-items: center;
+            justify-content: space-between;
         }
 
         .task-meta-item {
             display: flex;
             align-items: center;
             gap: 5px;
+            flex: 1;
+            min-width: 120px;
         }
 
         .notes-header {
@@ -362,6 +356,7 @@
             display: flex;
             gap: 8px;
             align-items: center;
+            flex: 0;
         }
 
         .delete-btn {
@@ -581,6 +576,16 @@
             line-height: 30px !important;
         }
 
+        .subheading-selector {
+            margin: 8px 0;
+            width: 100%;
+        }
+
+        .subheading-selector select {
+            width: 100%;
+            max-width: 200px;
+        }
+
         @media (max-width: 768px) {
             body {
                 flex-direction: column;
@@ -591,20 +596,19 @@
                 height: auto;
             }
             
-            .wide-input-section {
+            .input-section {
                 flex-direction: column;
-                gap: 10px;
             }
             
             .wide-input-section .input-group:first-child,
-            .wide-input-section .input-group {
+            .wide-input-section .input-group:not(:first-child) {
                 flex: 1 0 100%;
                 min-width: 100%;
             }
             
             .wide-input-section button {
+                margin-left: 0;
                 width: 100%;
-                margin-top: 10px;
             }
             
             .task-meta {
@@ -706,7 +710,7 @@
                     <label for="taskDue">Due Date</label>
                     <input type="date" id="taskDue">
                 </div>
-                <div class="input-group priority-group">
+                <div class="input-group">
                     <label>Priority</label>
                     <div class="star-rating" id="priorityStars">
                         <i class="fas fa-star" data-value="1"></i>
@@ -716,7 +720,7 @@
                         <i class="fas fa-star" data-value="5"></i>
                     </div>
                 </div>
-                <div class="input-group color-group">
+                <div class="input-group">
                     <label>Color</label>
                     <div class="color-picker" id="taskColorPicker">
                         <div class="color-option selected" style="background-color: #1a73e8;" data-color="#1a73e8"></div>
@@ -1103,6 +1107,7 @@
             const taskElement = document.createElement('div');
             taskElement.className = `task-item priority-${task.priority} ${task.completed ? 'completed' : ''}`;
             taskElement.setAttribute('data-id', task.id);
+            taskElement.style.borderLeftColor = task.color;
             
             // Calculate timeline progress if dates exist
             let timelineHTML = '';
