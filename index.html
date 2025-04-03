@@ -729,17 +729,17 @@
             renderProcesses();
         }
 
-        function renderSubheadings(type) {
+        function renderSubheadings(type, filteredProcesses = processes) {
             const listContainer = document.getElementById('processesList');
             listContainer.innerHTML = '';
             
             processSubheadings.forEach((subheading, index) => {
-                renderItemsForSubheading(type, subheading, listContainer, index);
+                renderItemsForSubheading(type, subheading, listContainer, index, filteredProcesses);
             });
         }
 
-        function renderItemsForSubheading(type, subheading, container, index) {
-            let items = processes.filter(p => p.subheading === subheading);
+        function renderItemsForSubheading(type, subheading, container, index, filteredProcesses = processes) {
+            let items = filteredProcesses.filter(p => p.subheading === subheading);
             if (items.length === 0) return;
             
             const isCollapsed = collapsedSubheadings[`${type}-${subheading}`] || false;
@@ -898,7 +898,7 @@
         }
 
         function renderProcesses(filteredProcesses = processes) {
-            renderSubheadings('process');
+            renderSubheadings('process', filteredProcesses);
         }
 
         function updateProcessField(id, field, value) {
@@ -944,7 +944,7 @@
         function searchProcesses() {
             const searchTerm = document.getElementById('processSearch').value.toLowerCase();
             if (!searchTerm) {
-                renderProcesses();
+                renderProcesses(processes);
                 return;
             }
             
